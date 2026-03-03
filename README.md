@@ -1,8 +1,4 @@
-Aqui está o seu `README.md` perfeitamente formatado. Arrumo os blocos de código, a árvore de arquivos e as tags das badges para que fiquem com o visual correto no GitHub.
 
-Basta clicar em **"Copiar código"** no canto superior direito do bloco abaixo e colar direto no seu repositório:
-
-```markdown
 <div align="center">
   <img src="./assets/icon.png" alt="Maestro Logo" width="120" height="120" />
   <h1>Maestro (GEM)</h1>
