@@ -1,20 +1,21 @@
-me de esse texto exatamente como está mas com tudo pronto pra eu dar só control+c e consguir dar control v no github e ele fique pefeitamente foramtado
-Aqui está o conteúdo do README.md formatado para o projeto Maestro:
+Aqui está o seu `README.md` perfeitamente formatado. Arrumo os blocos de código, a árvore de arquivos e as tags das badges para que fiquem com o visual correto no GitHub.
 
-markdown
+Basta clicar em **"Copiar código"** no canto superior direito do bloco abaixo e colar direto no seu repositório:
+
+```markdown
 <div align="center">
   <img src="./assets/icon.png" alt="Maestro Logo" width="120" height="120" />
   <h1>Maestro (GEM)</h1>
   <p><strong>Organização e acompanhamento musical para o Grupo de Estudos Musicais</strong></p>
 
   <p>
-    <a href="#sobre-o-projeto">Sobre</a> •
-    <a href="#funcionalidades">Funcionalidades</a> •
-    <a href="#tecnologias">Tecnologias</a> •
-    <a href="#instalação-direta-apk">APK</a> •
-    <a href="#como-executar">Como executar</a> •
-    <a href="#build-e-publicação">Build</a> •
-    <a href="#downloads">Downloads</a>
+    <a href="#-sobre-o-projeto">Sobre</a> •
+    <a href="#-funcionalidades">Funcionalidades</a> •
+    <a href="#-tecnologias-utilizadas">Tecnologias</a> •
+    <a href="#-instalação-direta-apk">APK</a> •
+    <a href="#-como-executar-o-projeto-para-desenvolvedores">Como executar</a> •
+    <a href="#-build-e-publicação">Build</a> •
+    <a href="#-downloads">Downloads</a>
   </p>
 
   <p>
@@ -108,45 +109,47 @@ markdown
 ---
 
 ## 📁 Estrutura de pastas
+
+```text
 Maestro/
-├── assets/ # Imagens, ícones, splash
-│ ├── icon.png
-│ ├── splash.png
-│ └── ...
+├── assets/             # Imagens, ícones, splash
+│   ├── icon.png
+│   ├── splash.png
+│   └── ...
 ├── src/
-│ ├── screens/
-│ │ ├── LoginScreen.js
-│ │ ├── DashboardScreen.js
-│ │ ├── AlunosScreen.js
-│ │ ├── MetodosScreen.js
-│ │ ├── ProfessoresScreen.js
-│ │ ├── LancesScreen.js
-│ │ ├── ProgressoScreen.js
-│ │ ├── RelatoriosScreen.js
-│ │ ├── ConfiguracoesScreen.js
-│ │ └── LogsScreen.js
-│ ├── components/
-│ │ ├── AlunoCard.js
-│ │ ├── GraficoEvolucao.js
-│ │ └── ...
-│ ├── utils/
-│ │ ├── supabase.js # Configuração do Supabase
-│ │ ├── auth.js
-│ │ ├── database.js
-│ │ └── exporters.js
-│ ├── context/
-│ │ ├── AuthContext.js
-│ │ └── TemaContext.js
-│ ├── theme.js
-│ └── App.js
-├── .env # Variáveis de ambiente (não versionar)
+│   ├── screens/
+│   │   ├── LoginScreen.js
+│   │   ├── DashboardScreen.js
+│   │   ├── AlunosScreen.js
+│   │   ├── MetodosScreen.js
+│   │   ├── ProfessoresScreen.js
+│   │   ├── LancesScreen.js
+│   │   ├── ProgressoScreen.js
+│   │   ├── RelatoriosScreen.js
+│   │   ├── ConfiguracoesScreen.js
+│   │   └── LogsScreen.js
+│   ├── components/
+│   │   ├── AlunoCard.js
+│   │   ├── GraficoEvolucao.js
+│   │   └── ...
+│   ├── utils/
+│   │   ├── supabase.js # Configuração do Supabase
+│   │   ├── auth.js
+│   │   ├── database.js
+│   │   └── exporters.js
+│   ├── context/
+│   │   ├── AuthContext.js
+│   │   └── TemaContext.js
+│   ├── theme.js
+│   └── App.js
+├── .env                # Variáveis de ambiente (não versionar)
 ├── .gitignore
 ├── app.json
 ├── eas.json
 ├── package.json
 └── README.md
 
-text
+```
 
 ---
 
@@ -154,7 +157,7 @@ text
 
 A maneira mais rápida de experimentar o **Maestro** é baixar o APK e instalar diretamente no seu celular Android.
 
-1. **Baixe o APK** na seção [Downloads](#downloads) abaixo.
+1. **Baixe o APK** na seção [Downloads](https://www.google.com/search?q=%23-downloads) abaixo.
 2. No seu celular, permita a instalação de apps de fontes desconhecidas (geralmente em *Configurações > Segurança*).
 3. Abra o arquivo baixado e clique em **Instalar**.
 4. Pronto! Agora é só abrir o app e começar a usar.
@@ -167,10 +170,10 @@ A maneira mais rápida de experimentar o **Maestro** é baixar o APK e instalar 
 
 ### Pré-requisitos
 
-- Node.js (versão LTS recomendada)
-- Expo CLI (`npm install -g expo-cli`) ou use `npx expo`
-- Conta no [Supabase](https://supabase.io/) e um projeto configurado
-- Um dispositivo físico com **Expo Go** instalado ou um emulador configurado
+* Node.js (versão LTS recomendada)
+* Expo CLI (`npm install -g expo-cli`) ou use `npx expo`
+* Conta no [Supabase](https://supabase.io/) e um projeto configurado
+* Um dispositivo físico com **Expo Go** instalado ou um emulador configurado
 
 ### Configuração do Supabase
 
@@ -182,132 +185,140 @@ A maneira mais rápida de experimentar o **Maestro** é baixar o APK e instalar 
 ### Passos para rodar localmente
 
 1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/Maestro.git
-   cd Maestro
-Instale as dependências:
+```bash
+git clone [https://github.com/seu-usuario/Maestro.git](https://github.com/seu-usuario/Maestro.git)
+cd Maestro
 
-bash
+```
+
+
+2. Instale as dependências:
+```bash
 npm install
-Crie um arquivo .env na raiz com as seguintes variáveis:
 
-env
+```
+
+
+3. Crie um arquivo `.env` na raiz com as seguintes variáveis:
+```env
 EXPO_PUBLIC_SUPABASE_URL=sua_url_do_supabase
 EXPO_PUBLIC_SUPABASE_ANON_KEY=sua_anon_key
 EXPO_PUBLIC_ORG_JOIN_CODE=codigo_de_acesso
-Inicie o projeto:
 
-bash
+```
+
+
+4. Inicie o projeto:
+```bash
 npx expo start -c
-Escaneie o QR Code com o aplicativo Expo Go (Android/iOS) ou pressione a para abrir no emulador Android.
 
-📲 Build e publicação
-Gerar APK (Android) - APENAS APK, SEM AAB
-Instale o EAS CLI:
+```
 
-bash
+
+5. Escaneie o QR Code com o aplicativo Expo Go (Android/iOS) ou pressione `a` para abrir no emulador Android.
+
+---
+
+## 📲 Build e publicação
+
+**Gerar APK (Android) - APENAS APK, SEM AAB**
+
+1. Instale o EAS CLI:
+```bash
 npm install -g eas-cli
-Faça login na sua conta Expo:
 
-bash
+```
+
+
+2. Faça login na sua conta Expo:
+```bash
 eas login
-Configure o EAS (se ainda não fez):
 
-bash
+```
+
+
+3. Configure o EAS (se ainda não fez):
+```bash
 eas build:configure
-Para gerar um APK de teste (instalação direta):
 
-bash
+```
+
+
+4. Para gerar um APK de teste (instalação direta):
+```bash
 eas build --profile preview --platform android
-O arquivo gerado estará disponível para download no site do Expo ou via link fornecido ao final do build.
-Nota: O projeto atual não gera AAB para Play Store, apenas APK para distribuição direta.
 
-📥 Downloads
-APK (última versão): Download Maestro.apk
+```
 
-Slide de apresentação do projeto: Ver PDF
 
-Links atualizados conforme novas versões são lançadas.
 
-🤝 Contribuição
+> **Nota:** O arquivo gerado estará disponível para download no site do Expo ou via link fornecido ao final do build. O projeto atual não gera AAB para Play Store, apenas APK para distribuição direta.
+
+---
+
+## 📥 Downloads
+
+* **APK (última versão):** [Download Maestro.apk](https://www.google.com/search?q=%23)
+* **Slide de apresentação do projeto:** [Ver PDF](https://www.google.com/search?q=%23)
+
+*(Links atualizados conforme novas versões são lançadas.)*
+
+---
+
+## 🤝 Contribuição
+
 Contribuições são sempre bem-vindas! Sinta-se à vontade para abrir uma issue ou enviar um pull request.
 
-Faça um fork do projeto
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
 
-Crie uma branch para sua feature (git checkout -b feature/nova-feature)
+---
 
-Commit suas mudanças (git commit -m 'Adiciona nova feature')
+## 📄 Licença
 
-Push para a branch (git push origin feature/nova-feature)
+Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
-Abra um Pull Request
+---
 
-📄 Licença
-Distribuído sob a licença MIT. Veja LICENSE para mais informações.
+## 👨‍💻 Autor e Créditos
 
-👨‍💻 Autor e Créditos
-Desenvolvido por BarujaFe para o Grupo de Estudo Musical de Vargem Grande do Sul.
-https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github
-https://img.shields.io/badge/-LinkedIn-0077B5?style=flat-square&logo=linkedin
+Desenvolvido por **BarujaFe** para o Grupo de Estudo Musical de Vargem Grande do Sul.
 
-<p align="center"> <i>Este aplicativo foi desenvolvido para o Grupo de Estudo Musical de Vargem Grande do Sul.</i> </p>
-<p align="center"> <img src="./docs/screenshots/dashboard.png" alt="Dashboard" width="200" /> <img src="./docs/screenshots/aluno.png" alt="Tela do Aluno" width="200" /> <img src="./docs/screenshots/relatorios.png" alt="Relatórios" width="200" /> </p> ```
-Instruções para criar o repositório e fazer o upload
-Crie o repositório no GitHub com o nome Maestro (ou Maestro-GEM). Não adicione README, .gitignore ou licença pelo site para evitar conflitos.
+<p align="center">
+<i>Este aplicativo foi desenvolvido para o Grupo de Estudo Musical de Vargem Grande do Sul.</i>
+</p>
 
-Prepare a pasta local com a estrutura mencionada, incluindo o arquivo .gitignore (use o template "Expo" ou adicione manualmente as pastas node_modules/, .expo/, etc.).
+<p align="center">
+<img src="./docs/screenshots/dashboard.png" alt="Dashboard" width="200" />
+<img src="./docs/screenshots/aluno.png" alt="Tela do Aluno" width="200" />
+<img src="./docs/screenshots/relatorios.png" alt="Relatórios" width="200" />
+</p>
 
-Copie o conteúdo do README.md acima e salve como README.md na raiz do projeto.
+```
 
-Coloque o APK em uma pasta apk/ ou, melhor, prepare uma Release após o push. Como você quer incluir o APK e o slide no repositório, crie as pastas:
+-----
 
-apk/ para o arquivo .apk.
+### Instruções para criar o repositório e fazer o upload (Para sua referência)
 
-docs/ para o slide (PDF).
+Deixei essas instruções fora do bloco principal para não sujarem o seu `README.md`.
 
-Adicione os arquivos:
+1.  Crie o repositório no GitHub com o nome **Maestro** (ou Maestro-GEM). Não adicione README, `.gitignore` ou licença pelo site para evitar conflitos.
+2.  Prepare a pasta local com a estrutura mencionada, incluindo o arquivo `.gitignore` (use o template "Expo" ou adicione manualmente as pastas `node_modules/`, `.expo/`, etc.).
+3.  Cole o conteúdo do bloco acima e salve como `README.md` na raiz do projeto.
+4.  Crie as pastas `apk/` (para o arquivo `.apk`) e `docs/` (para o slide em PDF).
+5.  Adicione os arquivos e faça o push:
+    ```bash
+    git add .
+    git commit -m "Adiciona estrutura inicial do Maestro"
+    git branch -M main
+    git remote add origin https://github.com/seu-usuario/Maestro.git
+    git push -u origin main
+    ```
+    *(Se o repositório remoto não estiver vazio, use `git pull origin main --allow-unrelated-histories` e depois `git push`)*.
 
-bash
-git add .
-git commit -m "Adiciona estrutura inicial do Maestro"
-git branch -M main
-git remote add origin https://github.com/seu-usuario/Maestro.git
-git push -u origin main
-Se o repositório remoto não estiver vazio, use git pull origin main --allow-unrelated-histories e depois git push.
+Quer que eu te ajude a gerar um arquivo `.gitignore` padrão para projetos Expo/React Native para garantir que nenhuma pasta desnecessária suba para o GitHub?
 
-Crie uma Release (opcional, mas recomendado para disponibilizar o APK de forma organizada):
-
-No GitHub, vá em "Releases" > "Create a new release".
-
-Tag: v1.0.0
-
-Título: "Versão 1.0.0"
-
-Descrição: "Primeira versão estável do Maestro para o GEM."
-
-Anexe o arquivo .apk e o slide (PDF) se desejar.
-
-Publique.
-
-Atualize os links no README após a release, substituindo seu-usuario e o caminho do APK pelo link direto da release.
-
-📦 Arquivos essenciais para o repositório
-.gitignore (com as regras do Expo)
-
-README.md (o conteúdo acima)
-
-app.json (configuração do Expo)
-
-package.json (dependências)
-
-src/ (todo o código fonte)
-
-assets/ (ícone, splash, imagens)
-
-apk/ (pasta com o APK, se for versionar)
-
-docs/ (pasta com o slide PDF)
-
-Lembre-se de não versionar o arquivo .env (adicione no .gitignore).
-
-Se precisar de mais alguma coisa, é só falar! 😊
+```
