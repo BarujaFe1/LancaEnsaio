@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Maestro",
+    "slug": "maestro",
+    "version": "1.0.1",
+    "icon": "./assets/icon.png",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "android": {
+      "package": "com.maestro.gem",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0b1220"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fc286e3a-e38b-4fec-aac6-1f4919e63d14"
+      }
+    }
+  }
+}
