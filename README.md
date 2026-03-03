@@ -292,29 +292,3 @@ Desenvolvido por **BarujaFe** para o Grupo de Estudo Musical de Vargem Grande do
 <img src="./docs/screenshots/aluno.png" alt="Tela do Aluno" width="200" />
 <img src="./docs/screenshots/relatorios.png" alt="Relatórios" width="200" />
 </p>
-
-```
-
------
-
-### Instruções para criar o repositório e fazer o upload (Para sua referência)
-
-Deixei essas instruções fora do bloco principal para não sujarem o seu `README.md`.
-
-1.  Crie o repositório no GitHub com o nome **Maestro** (ou Maestro-GEM). Não adicione README, `.gitignore` ou licença pelo site para evitar conflitos.
-2.  Prepare a pasta local com a estrutura mencionada, incluindo o arquivo `.gitignore` (use o template "Expo" ou adicione manualmente as pastas `node_modules/`, `.expo/`, etc.).
-3.  Cole o conteúdo do bloco acima e salve como `README.md` na raiz do projeto.
-4.  Crie as pastas `apk/` (para o arquivo `.apk`) e `docs/` (para o slide em PDF).
-5.  Adicione os arquivos e faça o push:
-    ```bash
-    git add .
-    git commit -m "Adiciona estrutura inicial do Maestro"
-    git branch -M main
-    git remote add origin https://github.com/seu-usuario/Maestro.git
-    git push -u origin main
-    ```
-    *(Se o repositório remoto não estiver vazio, use `git pull origin main --allow-unrelated-histories` e depois `git push`)*.
-
-Quer que eu te ajude a gerar um arquivo `.gitignore` padrão para projetos Expo/React Native para garantir que nenhuma pasta desnecessária suba para o GitHub?
-
-```
