@@ -1,10 +1,4 @@
 
-<div align="center">
-<<<<<<< HEAD
-  <img src="./assets/icon.png" alt="Maestro Logo" width="120" height="120" />
-  <h1>Maestro (GEM)</h1>
-  <p><strong>Organização e acompanhamento musical para o Grupo de Estudos Musicais</strong></p>
-=======
   <img src="./assets/icon.png" alt="LançaEnsaio Logo" width="120" height="120" />
   <h1>LançaEnsaio</h1>
   <p><strong>Registros de ensaio rápidos, padronizados e auditáveis</strong></p>
