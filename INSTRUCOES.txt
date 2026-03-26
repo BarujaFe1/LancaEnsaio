@@ -1,0 +1,29 @@
+PATCH — Alertar (coluna H) + Horário do lançamento (coluna A)
+
+Arquivos no ZIP:
+- supabase/functions/api/index.ts
+- mobile/app/(tabs)/index.tsx
+- INSTRUCOES.txt
+
+A) SUPABASE
+1) Substitua:
+   D:\Códigos\meu-app-orquestra\supabase\functions\api\index.ts
+2) Deploy:
+   supabase functions deploy api --no-verify-jwt
+
+B) MOBILE
+1) Substitua:
+   D:\Códigos\meu-app-orquestra\mobile\app\(tabs)\index.tsx
+2) Teste:
+   cd mobile
+   npx expo start -c
+
+C) APK (mundo todo)
+1) Configure no EAS (production):
+   eas env:create --name EXPO_PUBLIC_API_URL --value https://SEU_PROJECT_REF.supabase.co/functions/v1/api --environment production --visibility plaintext
+2) Build:
+   eas build -p android --profile production
+
+Uso:
+- Gravar -> salva horário na coluna A e ID na coluna B.
+- Alertar -> escreve aviso manual na coluna H do mesmo registro.

@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "LançaEnsaio",
+    "slug": "lancaensaio",
+    "version": "1.0.0",
+    "scheme": "lancaensaio",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F1115"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.barujafe.lancaensaio",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0F1115"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2e370cb6-2785-46bc-82df-1ba7ae354775"
+      }
+    }
+  }
+}
