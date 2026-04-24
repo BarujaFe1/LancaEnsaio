@@ -1,26 +1,54 @@
-node_modules/
+# .gitignore
+
+# Expo
 .expo/
 dist/
-build/
-coverage/
-.turbo/
-.next/
-*.log
-*.tmp
-*.temp
-*.bak
-*.old
-*.zip
-*.rar
-*.7z
+web-build/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Credentials
+credentials.json
+*.pem
+*.key
+
+# Build
 *.apk
 *.aab
-*.keystore
-*.jks
-.env
-.env.*
-credentials.json
+*.ipa
+build/
+android/app/build/
+ios/Pods/
+
+# Logs
+*.log
+logs/
+
+# Temporary
+tmp/
+temp/
 _scan_output/
-backend/.env
-backend/credentials.json
-mobile/.env
+
+# Lock files (mantemos apenas no mobile)
+package-lock.json
+yarn.lock
