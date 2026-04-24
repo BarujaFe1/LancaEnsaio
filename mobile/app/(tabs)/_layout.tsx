@@ -51,6 +51,22 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="alert"
         options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Configurações',
+          tabBarLabel: 'Config',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="alert"
+        options={{
           title: 'Alerta Manual',
           tabBarLabel: 'Alerta',
           tabBarIcon: ({ color, size }) => (
