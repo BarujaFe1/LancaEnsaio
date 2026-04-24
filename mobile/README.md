@@ -1,50 +1,50 @@
-# Welcome to your Expo app 👋
+# LançaEnsaio - Versão Unificada
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Este projeto unifica os fluxos de lançamento de ensaios para **Irmãos** e **Irmãs** em um único aplicativo móvel e um único backend Supabase Edge Function.
 
-## Get started
+## 🚀 Arquitetura Simplificada
 
-1. Install dependencies
+- **App Mobile**: Expo / React Native (Expo Router).
+- **Backend**: Supabase Edge Function (Deno).
+- **Planilha**: Google Sheets (Aba "Base Geral" para config e "Dados Geral" para registros).
 
+## 🛠️ Principais Mudanças
+
+1. **Sem Login Tradicional**: O app identifica o lançador pelo nome informado no setup inicial.
+2. **Setup Inicial**: Na primeira abertura, o usuário escolhe o modo (Irmãos/Irmãs) e informa seu nome.
+3. **Abas no App**:
+   - **Lançar**: Formulário dinâmico baseado no modo selecionado.
+   - **Alerta**: Envio de avisos manuais para registros já feitos.
+   - **Ajustes**: Troca de modo, edição de nome e limpeza de cache.
+4. **Backend Unificado**: A Edge Function `/api` processa ambos os fluxos e grava metadados de auditoria.
+5. **Auditoria**: Registra `META APP=UNIFICADO TIPO={TIPO} USER={NOME}` na coluna H.
+
+## 📦 Como Rodar (Mobile)
+
+1. Instale as dependências:
    ```bash
+   cd mobile
    npm install
    ```
 
-2. Start the app
+2. Configure o `.env` com a URL da API:
+   ```env
+   EXPO_PUBLIC_API_URL=https://SUA-URL-SUPABASE.supabase.co/functions/v1/api
+   ```
 
+3. Inicie o app:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+## ☁️ Backend (Supabase)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+O código da Edge Function está em `supabase/functions/api/index.ts`.
+Para deploy, utilize a CLI do Supabase:
 ```bash
-npm run reset-project
+supabase functions deploy api
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Certifique-se de configurar os segredos no Supabase:
+- `ORQUESTRA_SHEET_ID`: ID da planilha Google.
+- `GOOGLE_SERVICE_ACCOUNT_B64`: JSON da Service Account em Base64.

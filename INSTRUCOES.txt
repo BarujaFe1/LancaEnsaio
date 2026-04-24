@@ -1,29 +1,41 @@
-PATCH — Alertar (coluna H) + Horário do lançamento (coluna A)
+# LançaEnsaio - Versão Unificada
 
-Arquivos no ZIP:
-- supabase/functions/api/index.ts
-- mobile/app/(tabs)/index.tsx
-- INSTRUCOES.txt
+Instruções para deploy e manutenção do sistema unificado (Irmãos e Irmãs).
 
-A) SUPABASE
-1) Substitua:
-   D:\Códigos\meu-app-orquestra\supabase\functions\api\index.ts
-2) Deploy:
+## 1. Backend (Supabase Edge Function)
+
+1. Arquivo principal: `supabase/functions/api/index.ts`
+2. Configure as Secrets no Supabase:
+   - `ORQUESTRA_SHEET_ID`: ID da sua planilha Google.
+   - `GOOGLE_SERVICE_ACCOUNT_B64`: JSON da Service Account em Base64.
+3. Deploy da Function:
+   ```bash
    supabase functions deploy api --no-verify-jwt
+   ```
 
-B) MOBILE
-1) Substitua:
-   D:\Códigos\meu-app-orquestra\mobile\app\(tabs)\index.tsx
-2) Teste:
+## 2. Mobile (Expo)
+
+1. Arquivos principais:
+   - `mobile/app/(tabs)/index.tsx` (Lançar)
+   - `mobile/app/(tabs)/alert.tsx` (Alerta)
+   - `mobile/app/(tabs)/settings.tsx` (Configurações)
+   - `mobile/app/setup.tsx` (Fluxo inicial)
+2. Dependências:
+   ```bash
    cd mobile
-   npx expo start -c
+   npm install
+   ```
+3. Rodar localmente:
+   ```bash
+   npx expo start
+   ```
+4. Build APK (EAS):
+   - Certifique-se de configurar `EXPO_PUBLIC_API_URL` no EAS.
+   - `eas build -p android --profile production`
 
-C) APK (mundo todo)
-1) Configure no EAS (production):
-   eas env:create --name EXPO_PUBLIC_API_URL --value https://SEU_PROJECT_REF.supabase.co/functions/v1/api --environment production --visibility plaintext
-2) Build:
-   eas build -p android --profile production
+## 3. Funcionamento Unificado
 
-Uso:
-- Gravar -> salva horário na coluna A e ID na coluna B.
-- Alertar -> escreve aviso manual na coluna H do mesmo registro.
+- O app solicita Nome e Modo (Irmãos/Irmãs) na primeira vez.
+- Não há login tradicional.
+- A auditoria grava: `META APP=UNIFICADO TIPO={tipo} USER={nome}`.
+- O sistema de "locks" foi removido para maior simplicidade (Append simples).
