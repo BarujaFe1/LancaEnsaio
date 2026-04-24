@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { api } from '../../src/api';
-import { getPrefs } from '../../src/session';
+import { getPrefs, savePrefs } from '../../src/session';
 
 type ConfigData = {
   instrumentos: Record<string, string[]>;
@@ -64,6 +64,16 @@ export default function LaunchScreen() {
     carregarTudo();
   }, []);
 
+  const handleTrocarTipo = async (novoTipo: 'IRMAOS' | 'IRMAS') => {
+    await savePrefs({ tipoSelecionado: novoTipo });
+    setPrefs(prev => ({ ...prev, tipoSelecionado: novoTipo }));
+    // Limpar campos ao trocar
+    setCategoria('');
+    setInstrumento('');
+    setMinisterio('');
+    setMusicaCargo('');
+  };
+
   const handleLancar = async () => {
     if (!cidade) {
       Alert.alert('Atenção', 'Selecione a cidade.');
@@ -86,7 +96,7 @@ export default function LaunchScreen() {
       const id = res.data?.idGerado || 'SUCESSO';
       setUltimoId(id);
       
-      Alert.alert('Sucesso!', `Registro enviado. ID: ${id}`);
+      Alert.alert('✓ Lançamento Registrado', `ID: ${id}`, [{ text: 'OK' }]);
       
       // Limpar campos secundários mas manter cidade por conveniência
       setCategoria('');
@@ -120,7 +130,7 @@ export default function LaunchScreen() {
         nomeLancador: prefs.nomeLancador,
       });
 
-      Alert.alert('Sucesso!', `Alerta adicionado ao registro ${ultimoId}`);
+      Alert.alert('✓ Alerta Adicionado', `Registro ${ultimoId} atualizado.`);
       setTextoAlerta('');
       setModoAlerta(false);
     } catch (err: any) {
@@ -140,10 +150,12 @@ export default function LaunchScreen() {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#34C759" />
-        <Text style={styles.loadingText}>Carregando cérebro...</Text>
+        <Text style={styles.loadingText}>Carregando...</Text>
       </View>
     );
   }
+
+  const isIrmaos = prefs.tipoSelecionado === 'IRMAOS';
 
   return (
     <KeyboardAvoidingView
@@ -154,293 +166,438 @@ export default function LaunchScreen() {
         contentContainerStyle={styles.scrollContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={carregarTudo} tintColor="#34C759" />}
       >
+        {/* Header Premium */}
         <View style={styles.header}>
-          <Text style={styles.welcome}>Olá, {prefs.nomeLancador}</Text>
-          <Text style={styles.modeIndicator}>
-            Modo: <Text style={styles.modeText}>{prefs.tipoSelecionado === 'IRMAS' ? 'IRMÃS' : 'IRMÃOS'}</Text>
-          </Text>
+          <View style={styles.headerTop}>
+            <View>
+              <Text style={styles.greeting}>Olá,</Text>
+              <Text style={styles.userName}>{prefs.nomeLancador}</Text>
+            </View>
+            {ultimoId && (
+              <View style={styles.lastIdBadge}>
+                <Text style={styles.lastIdLabel}>Último ID</Text>
+                <Text style={styles.lastIdValue}>{ultimoId}</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Seletor de Modo Premium */}
+          <View style={styles.modeSelector}>
+            <TouchableOpacity
+              style={[styles.modeButton, isIrmaos && styles.modeButtonActive]}
+              onPress={() => handleTrocarTipo('IRMAOS')}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.modeButtonText, isIrmaos && styles.modeButtonTextActive]}>
+                Irmãos
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modeButton, !isIrmaos && styles.modeButtonActive]}
+              onPress={() => handleTrocarTipo('IRMAS')}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.modeButtonText, !isIrmaos && styles.modeButtonTextActive]}>
+                Irmãs
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View style={styles.form}>
-          <Text style={styles.label}>Cidade</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={cidade}
-              onValueChange={setCidade}
-              style={styles.picker}
-              dropdownIconColor="#34C759"
-              itemStyle={styles.pickerItem}
-            >
-              <Picker.Item label="Selecione uma cidade..." value="" />
-              {(config?.cidades || []).map((c) => (
-                <Picker.Item key={c} label={c} value={c} />
-              ))}
-            </Picker>
-          </View>
+        {!modoAlerta ? (
+          <>
+            {/* Formulário de Lançamento */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Novo Lançamento</Text>
 
-          {prefs.tipoSelecionado === 'IRMAOS' && (
-            <>
-              <Text style={styles.label}>Categoria</Text>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={categoria}
-                  onValueChange={(val) => {
-                    setCategoria(val);
-                    setInstrumento('');
-                  }}
-                  style={styles.picker}
-                  dropdownIconColor="#34C759"
-                  itemStyle={styles.pickerItem}
-                >
-                  <Picker.Item label="Nenhuma (Canto)" value="" />
-                  {Object.keys(config?.instrumentos || {}).map((cat) => (
-                    <Picker.Item key={cat} label={cat} value={cat} />
-                  ))}
-                </Picker>
+              {/* Cidade */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.label}>Cidade *</Text>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={cidade}
+                    onValueChange={setCidade}
+                    style={styles.picker}
+                    dropdownIconColor="#34C759"
+                  >
+                    <Picker.Item label="Selecione a cidade..." value="" />
+                    {(config?.cidades || []).map((c) => (
+                      <Picker.Item key={c} label={c} value={c} />
+                    ))}
+                  </Picker>
+                </View>
               </View>
 
-              {categoria ? (
+              {/* Campos específicos para IRMÃOS */}
+              {isIrmaos && (
                 <>
-                  <Text style={styles.label}>Instrumento</Text>
-                  <View style={styles.pickerContainer}>
-                    <Picker
-                      selectedValue={instrumento}
-                      onValueChange={setInstrumento}
-                      style={styles.picker}
-                      dropdownIconColor="#34C759"
-                      itemStyle={styles.pickerItem}
-                    >
-                      <Picker.Item label="Selecione..." value="" />
-                      {instrumentosFiltrados.map((inst) => (
-                        <Picker.Item key={inst} label={inst} value={inst} />
-                      ))}
-                    </Picker>
+                  <View style={styles.fieldGroup}>
+                    <Text style={styles.label}>Categoria</Text>
+                    <View style={styles.pickerContainer}>
+                      <Picker
+                        selectedValue={categoria}
+                        onValueChange={(val) => {
+                          setCategoria(val);
+                          setInstrumento('');
+                        }}
+                        style={styles.picker}
+                        dropdownIconColor="#34C759"
+                      >
+                        <Picker.Item label="Nenhuma (Canto)" value="" />
+                        {Object.keys(config?.instrumentos || {}).map((cat) => (
+                          <Picker.Item key={cat} label={cat} value={cat} />
+                        ))}
+                      </Picker>
+                    </View>
                   </View>
+
+                  {categoria && (
+                    <View style={styles.fieldGroup}>
+                      <Text style={styles.label}>Instrumento</Text>
+                      <View style={styles.pickerContainer}>
+                        <Picker
+                          selectedValue={instrumento}
+                          onValueChange={setInstrumento}
+                          style={styles.picker}
+                          dropdownIconColor="#34C759"
+                        >
+                          <Picker.Item label="Selecione..." value="" />
+                          {instrumentosFiltrados.map((inst) => (
+                            <Picker.Item key={inst} label={inst} value={inst} />
+                          ))}
+                        </Picker>
+                      </View>
+                    </View>
+                  )}
                 </>
-              ) : null}
-            </>
-          )}
+              )}
 
-          <Text style={styles.label}>Ministério (Se houver)</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={ministerio}
-              onValueChange={setMinisterio}
-              style={styles.picker}
-              dropdownIconColor="#34C759"
-              itemStyle={styles.pickerItem}
-            >
-              <Picker.Item label="Nenhum" value="" />
-              {(config?.ministerios || []).map((m) => (
-                <Picker.Item key={m} label={m} value={m} />
-              ))}
-            </Picker>
-          </View>
-
-          <Text style={styles.label}>Música/Cargo</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={musicaCargo}
-              onValueChange={setMusicaCargo}
-              style={styles.picker}
-              dropdownIconColor="#34C759"
-              itemStyle={styles.pickerItem}
-            >
-              <Picker.Item label="Nenhum" value="" />
-              {(config?.cargosMusicais || []).map((cargo) => (
-                <Picker.Item key={cargo} label={cargo} value={cargo} />
-              ))}
-            </Picker>
-          </View>
-
-          {categoria ? (
-            <>
-              <Text style={styles.label}>Instrumento</Text>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={instrumento}
-                  onValueChange={setInstrumento}
-                  style={styles.picker}
-                  dropdownIconColor="#34C759"
-                >
-                  <Picker.Item label="Selecione..." value="" color="#8E8E93" />
-                  {instrumentosFiltrados.map((inst) => (
-                    <Picker.Item key={inst} label={inst} value={inst} color="#FFFFFF" />
-                  ))}
-                </Picker>
+              {/* Ministério */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.label}>Ministério</Text>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={ministerio}
+                    onValueChange={setMinisterio}
+                    style={styles.picker}
+                    dropdownIconColor="#34C759"
+                  >
+                    <Picker.Item label="Nenhum" value="" />
+                    {(config?.ministerios || []).map((m) => (
+                      <Picker.Item key={m} label={m} value={m} />
+                    ))}
+                  </Picker>
+                </View>
               </View>
-            </>
-          ) : null}
 
-          <Text style={styles.label}>Ministério (Se houver)</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={ministerio}
-              onValueChange={setMinisterio}
-              style={styles.picker}
-              dropdownIconColor="#34C759"
-            >
-              <Picker.Item label="Nenhum" value="" color="#8E8E93" />
-              {(config?.ministerios || []).map((m) => (
-                <Picker.Item key={m} label={m} value={m} color="#FFFFFF" />
-              ))}
-            </Picker>
-          </View>
+              {/* Música/Cargo */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.label}>Música / Cargo</Text>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={musicaCargo}
+                    onValueChange={setMusicaCargo}
+                    style={styles.picker}
+                    dropdownIconColor="#34C759"
+                  >
+                    <Picker.Item label="Nenhum" value="" />
+                    {(config?.cargosMusicais || []).map((cargo) => (
+                      <Picker.Item key={cargo} label={cargo} value={cargo} />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
 
-          <Text style={styles.label}>Cargo / Função Musical</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={musicaCargo}
-              onValueChange={setMusicaCargo}
-              style={styles.picker}
-              dropdownIconColor="#34C759"
-            >
-              <Picker.Item label="Selecione..." value="" color="#8E8E93" />
-              {(config?.cargosMusicais || []).map((m) => (
-                <Picker.Item key={m} label={m} value={m} color="#FFFFFF" />
-              ))}
-            </Picker>
-          </View>
-
-          {!modoAlerta ? (
-            <>
+              {/* Botão Principal */}
               <TouchableOpacity
-                style={[styles.launchBtn, enviando && styles.btnDisabled]}
+                style={[styles.primaryButton, enviando && styles.primaryButtonDisabled]}
                 onPress={handleLancar}
                 disabled={enviando}
+                activeOpacity={0.8}
               >
                 {enviando ? (
-                  <ActivityIndicator color="#FFFFFF" />
+                  <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
-                  <Text style={styles.launchBtnText}>LANÇAR AGORA</Text>
+                  <>
+                    <Text style={styles.primaryButtonText}>Lançar Agora</Text>
+                    <Text style={styles.primaryButtonIcon}>→</Text>
+                  </>
                 )}
               </TouchableOpacity>
+            </View>
 
-              {ultimoId && (
-                <TouchableOpacity
-                  style={styles.alertBtn}
-                  onPress={() => setModoAlerta(true)}
-                >
-                  <Text style={styles.alertBtnText}>ALERTAR ÚLTIMO LANÇAMENTO ({ultimoId})</Text>
-                </TouchableOpacity>
-              )}
-            </>
-          ) : (
-            <>
-              <Text style={styles.label}>Alerta para {ultimoId}</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Digite o texto do alerta..."
-                placeholderTextColor="#8E8E93"
-                value={textoAlerta}
-                onChangeText={setTextoAlerta}
-                multiline
-                numberOfLines={3}
-              />
+            {/* Botão de Alerta */}
+            {ultimoId && (
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                onPress={() => setModoAlerta(true)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.secondaryButtonText}>⚠ Adicionar Alerta ao ID {ultimoId}</Text>
+              </TouchableOpacity>
+            )}
+          </>
+        ) : (
+          <>
+            {/* Modo Alerta */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Adicionar Alerta</Text>
+              <Text style={styles.cardSubtitle}>Registro: {ultimoId}</Text>
+
+              <View style={styles.fieldGroup}>
+                <Text style={styles.label}>Texto do Alerta *</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Digite o alerta..."
+                  placeholderTextColor="#6B7280"
+                  value={textoAlerta}
+                  onChangeText={setTextoAlerta}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
 
               <TouchableOpacity
-                style={[styles.launchBtn, enviando && styles.btnDisabled]}
+                style={[styles.primaryButton, enviando && styles.primaryButtonDisabled]}
                 onPress={handleAlertar}
                 disabled={enviando}
+                activeOpacity={0.8}
               >
                 {enviando ? (
-                  <ActivityIndicator color="#FFFFFF" />
+                  <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
-                  <Text style={styles.launchBtnText}>ENVIAR ALERTA</Text>
+                  <Text style={styles.primaryButtonText}>Enviar Alerta</Text>
                 )}
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.cancelBtn}
+                style={styles.cancelButton}
                 onPress={() => {
                   setModoAlerta(false);
                   setTextoAlerta('');
                 }}
+                activeOpacity={0.7}
               >
-                <Text style={styles.cancelBtnText}>CANCELAR</Text>
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>
-            </>
-          )}
-        </View>
+            </View>
+          </>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0F1115' },
-  scrollContent: { padding: 24, paddingBottom: 60 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0F1115' },
-  loadingText: { color: '#9CA3AF', marginTop: 12, fontWeight: '600' },
-  header: { marginBottom: 32 },
-  welcome: { color: '#FFFFFF', fontSize: 24, fontWeight: '900' },
-  modeIndicator: { color: '#9CA3AF', fontSize: 14, marginTop: 4 },
-  modeText: { color: '#34C759', fontWeight: '800' },
-  form: { gap: 16 },
-  label: { color: '#E5E7EB', fontWeight: '700', fontSize: 14, marginBottom: -8 },
-  pickerContainer: {
-    backgroundColor: '#2C2F38',
-    borderRadius: 12,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(52, 199, 89, 0.3)',
+  container: {
+    flex: 1,
+    backgroundColor: '#0A0B0E',
   },
-  picker: {
-    color: '#FFFFFF',
-    backgroundColor: '#2C2F38',
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 40,
   },
-  pickerItem: {
-    backgroundColor: '#2C2F38',
-    color: '#FFFFFF',
-  },
-  textInput: {
-    backgroundColor: '#2C2F38',
-    borderRadius: 12,
-    padding: 16,
-    color: '#FFFFFF',
-    fontSize: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(52, 199, 89, 0.3)',
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  launchBtn: {
-    backgroundColor: '#34C759',
-    paddingVertical: 18,
-    borderRadius: 12,
+  center: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
+    backgroundColor: '#0A0B0E',
+  },
+  loadingText: {
+    color: '#9CA3AF',
+    marginTop: 12,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+
+  // Header Premium
+  header: {
+    marginBottom: 24,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  greeting: {
+    color: '#9CA3AF',
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  userName: {
+    color: '#FFFFFF',
+    fontSize: 28,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+  lastIdBadge: {
+    backgroundColor: 'rgba(52, 199, 89, 0.15)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(52, 199, 89, 0.3)',
+  },
+  lastIdLabel: {
+    color: '#9CA3AF',
+    fontSize: 10,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  lastIdValue: {
+    color: '#34C759',
+    fontSize: 14,
+    fontWeight: '900',
+  },
+
+  // Seletor de Modo Premium
+  modeSelector: {
+    flexDirection: 'row',
+    backgroundColor: '#1A1D25',
+    borderRadius: 14,
+    padding: 4,
+    gap: 4,
+  },
+  modeButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modeButtonActive: {
+    backgroundColor: '#34C759',
     shadowColor: '#34C759',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },
-  btnDisabled: { opacity: 0.6 },
-  launchBtnText: { color: '#FFFFFF', fontSize: 18, fontWeight: '900', letterSpacing: 1 },
-  alertBtn: {
-    backgroundColor: '#FF9500',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 12,
+  modeButtonText: {
+    color: '#6B7280',
+    fontSize: 15,
+    fontWeight: '700',
   },
-  alertBtnText: {
+  modeButtonTextActive: {
     color: '#FFFFFF',
+  },
+
+  // Card
+  card: {
+    backgroundColor: '#1A1D25',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  cardTitle: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  cardSubtitle: {
+    color: '#9CA3AF',
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 20,
+  },
+
+  // Form Fields
+  fieldGroup: {
+    marginBottom: 20,
+  },
+  label: {
+    color: '#E5E7EB',
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  pickerContainer: {
+    backgroundColor: '#0F1115',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(52, 199, 89, 0.2)',
+    overflow: 'hidden',
+  },
+  picker: {
+    color: '#FFFFFF',
+    height: 50,
+  },
+  textInput: {
+    backgroundColor: '#0F1115',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(52, 199, 89, 0.2)',
+    padding: 16,
+    color: '#FFFFFF',
+    fontSize: 15,
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+
+  // Buttons
+  primaryButton: {
+    backgroundColor: '#34C759',
+    borderRadius: 14,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    shadowColor: '#34C759',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  primaryButtonDisabled: {
+    opacity: 0.5,
+  },
+  primaryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  primaryButtonIcon: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '900',
+  },
+  secondaryButton: {
+    backgroundColor: 'rgba(255, 149, 0, 0.15)',
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 149, 0, 0.3)',
+  },
+  secondaryButtonText: {
+    color: '#FF9500',
     fontSize: 14,
     fontWeight: '700',
   },
-  cancelBtn: {
-    backgroundColor: '#8E8E93',
+  cancelButton: {
+    backgroundColor: 'transparent',
+    borderRadius: 14,
     paddingVertical: 14,
-    borderRadius: 12,
     alignItems: 'center',
     marginTop: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  cancelBtnText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
+  cancelButtonText: {
+    color: '#9CA3AF',
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
