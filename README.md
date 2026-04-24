@@ -6,6 +6,16 @@
 [![Expo](https://img.shields.io/badge/Expo-54-000020?style=flat&logo=expo)](https://expo.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-Edge%20Functions-3ECF8E?style=flat&logo=supabase)](https://supabase.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-BarujaFe1-181717?style=flat&logo=github)](https://github.com/BarujaFe1)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-barujafe-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/barujafe/)
+
+<p align="center">
+  <a href="https://github.com/BarujaFe1/LancaEnsaio">Repositório</a> •
+  <a href="https://github.com/BarujaFe1">GitHub</a> •
+  <a href="https://www.linkedin.com/in/barujafe/">LinkedIn</a> •
+  <a href="docs/">Documentação</a> •
+  <a href="https://github.com/BarujaFe1/LancaEnsaio/issues">Issues</a>
+</p>
 
 ---
 
@@ -15,12 +25,12 @@
 
 ### ✨ Características
 
-- 🎨 **Design Premium** - Interface escura moderna com tipografia refinada
-- 🔄 **Modo Unificado** - Suporte para Irmãos e Irmãs no mesmo app
-- ⚡ **Sem Login** - Identificação simples por nome
-- 📊 **Integração Google Sheets** - Dados sincronizados em tempo real
-- 🌐 **Backend Serverless** - Supabase Edge Functions
-- 📱 **Offline-First** - Funciona sem internet (em breve)
+- 🎨 **Design Premium** — Interface escura moderna com tipografia refinada
+- 🔄 **Modo Unificado** — Suporte para Irmãos e Irmãs no mesmo app
+- ⚡ **Fluxo Simplificado** — Identificação rápida e lançamento direto
+- 📊 **Integração Google Sheets** — Dados sincronizados em tempo real
+- 🌐 **Backend Serverless** — Supabase Edge Functions
+- 📱 **Experiência Mobile** — Feito para uso prático no dia a dia
 
 ---
 
@@ -30,16 +40,17 @@
 - ✅ Seleção de categoria (Cordas, Metais, Madeiras, Teclas)
 - ✅ Escolha de instrumento específico
 - ✅ Registro de ministério e cargo musical
-- ✅ Lançamento com ID único (formato: MXXX1234)
+- ✅ Lançamento com ID único
 
 ### Para Irmãs
-- ✅ Registro simplificado (sem instrumento)
-- ✅ Seleção de cargo musical (Cantora, Organista, etc)
-- ✅ Lançamento com ID único (formato: F1234)
+- ✅ Registro simplificado
+- ✅ Seleção de cargo musical
+- ✅ Lançamento com ID único
+- ✅ Fluxo adaptado ao modo selecionado
 
 ### Recursos Gerais
 - ⚠️ Sistema de alertas para registros existentes
-- 🔄 Troca rápida entre modos (Irmãos/Irmãs)
+- 🔄 Troca rápida entre modos (Irmãos / Irmãs)
 - 📍 Seleção de cidade/congregação
 - 💾 Persistência de preferências locais
 - 🎨 Interface adaptativa por modo
@@ -59,46 +70,47 @@
 ```bash
 # 1. Clone o repositório
 git clone https://github.com/BarujaFe1/LancaEnsaio.git
-cd LancaEnsaio
 
-# 2. Instale as dependências
-cd mobile
+# 2. Acesse a pasta do projeto
+cd LancaEnsaio/mobile
+
+# 3. Instale as dependências
 npm install
 
-# 3. Inicie o app
+# 4. Inicie o app
 npx expo start
 ```
 
 ### Primeiro Uso
 
-1. Abra o **Expo Go** no celular
-2. Escaneie o QR Code que aparece no terminal
+1. Abra o **Expo Go** no celular.
+2. Escaneie o QR Code que aparece no terminal.
 3. Na tela de setup:
    - Digite seu nome
    - Escolha o modo (Irmãos ou Irmãs)
-   - Clique em "Salvar e Continuar"
-4. Pronto! Comece a lançar ensaios
+   - Clique em **Salvar e Continuar**
+4. Pronto. Comece a lançar ensaios.
 
 ---
 
 ## 📖 Documentação
 
 ### Guias Rápidos
-- [🚀 Comece Aqui](COMECE_AQUI.md) - Guia de início rápido
-- [📱 Teste Manual](TESTE_MANUAL_ATUALIZADO.md) - Roteiro de teste completo
-- [📦 Gerar APK](COMO_GERAR_APK.md) - Como gerar APK local
-- [🎨 Redesign v2.1](REDESIGN_V2.1.md) - Melhorias visuais
+- [🚀 Comece Aqui](COMECE_AQUI.md) — Guia de início rápido
+- [📱 Teste Manual](TESTE_MANUAL_ATUALIZADO.md) — Roteiro de teste completo
+- [📦 Gerar APK](COMO_GERAR_APK.md) — Como gerar APK local
+- [🎨 Redesign v2.1](REDESIGN_V2.1.md) — Melhorias visuais
 
 ### Documentação Técnica
-- [📋 Baseline Confirmada](docs/BASELINE_CONFIRMADA.md) - Evidências técnicas
-- [📊 Relatório de Execução](docs/RELATORIO_FINAL_EXECUCAO.md) - Relatório completo
-- [🔧 Correções v2.0](docs/RESUMO_CORRECOES_V2.md) - Histórico de correções
+- [📋 Baseline Confirmada](docs/BASELINE_CONFIRMADA.md) — Evidências técnicas
+- [📊 Relatório de Execução](docs/RELATORIO_FINAL_EXECUCAO.md) — Relatório completo
+- [🔧 Correções v2.0](docs/RESUMO_CORRECOES_V2.md) — Histórico de correções
 
 ---
 
 ## 🏗️ Arquitetura
 
-```
+```text
 ┌─────────────────┐
 │   Mobile App    │  React Native + Expo
 │  (React Native) │  TypeScript
@@ -125,8 +137,8 @@ npx expo start
 - React Native 0.76
 - Expo 54
 - TypeScript 5.3
-- Expo Router (navegação)
-- AsyncStorage (persistência)
+- Expo Router
+- AsyncStorage
 
 **Backend**
 - Supabase Edge Functions
@@ -135,9 +147,9 @@ npx expo start
 - Service Account Auth
 
 **Infraestrutura**
-- Supabase (hosting + functions)
-- Google Cloud (Sheets API)
-- GitHub (versionamento)
+- Supabase
+- Google Cloud
+- GitHub
 
 ---
 
@@ -147,18 +159,18 @@ npx expo start
 
 ```css
 /* Background */
---bg-primary: #0A0B0E;    /* Preto azulado profundo */
---bg-card: #1A1D25;       /* Cinza escuro */
---bg-field: #0F1115;      /* Preto mais escuro */
+--bg-primary: #0A0B0E;
+--bg-card: #1A1D25;
+--bg-field: #0F1115;
 
 /* Ações */
---primary: #34C759;       /* Verde vibrante */
---warning: #FF9500;       /* Laranja */
+--primary: #34C759;
+--warning: #FF9500;
 
 /* Texto */
---text-primary: #FFFFFF;  /* Branco */
---text-secondary: #9CA3AF;/* Cinza */
---text-label: #E5E7EB;    /* Cinza claro */
+--text-primary: #FFFFFF;
+--text-secondary: #9CA3AF;
+--text-label: #E5E7EB;
 ```
 
 ### Tipografia
@@ -172,29 +184,29 @@ npx expo start
 
 ## 📦 Estrutura do Projeto
 
-```
+```text
 LancaEnsaio/
-├── mobile/                 # App React Native
-│   ├── app/               # Rotas (Expo Router)
-│   │   ├── (tabs)/       # Telas com tabs
-│   │   │   ├── index.tsx # Tela principal
+├── mobile/
+│   ├── app/
+│   │   ├── (tabs)/
+│   │   │   ├── index.tsx
 │   │   │   └── settings.tsx
-│   │   ├── setup.tsx     # Setup inicial
-│   │   └── _layout.tsx   # Layout raiz
-│   ├── src/              # Código fonte
-│   │   ├── api.ts        # Cliente HTTP
-│   │   └── session.ts    # Gerenciamento de sessão
-│   ├── assets/           # Imagens e ícones
-│   ├── .env              # Variáveis de ambiente
-│   ├── app.json          # Configuração Expo
-│   └── package.json      # Dependências
-├── supabase/             # Backend
-│   ├── functions/        # Edge Functions
-│   │   └── api/         # API principal
-│   └── config.toml       # Configuração
-├── docs/                 # Documentação técnica
-├── COMECE_AQUI.md       # Guia de início
-└── README.md            # Este arquivo
+│   │   ├── setup.tsx
+│   │   └── _layout.tsx
+│   ├── src/
+│   │   ├── api.ts
+│   │   └── session.ts
+│   ├── assets/
+│   ├── .env
+│   ├── app.json
+│   └── package.json
+├── supabase/
+│   ├── functions/
+│   │   └── api/
+│   └── config.toml
+├── docs/
+├── COMECE_AQUI.md
+└── README.md
 ```
 
 ---
@@ -228,7 +240,7 @@ supabase functions deploy api --no-verify-jwt
 
 ## 📱 Gerar APK
 
-### Método 1: Build Local (Rápido)
+### Método 1: Build Local
 
 ```bash
 cd mobile
@@ -242,7 +254,7 @@ cd mobile
 eas build --platform android --profile production
 ```
 
-Ver [COMO_GERAR_APK.md](COMO_GERAR_APK.md) para instruções completas.
+Veja também: [COMO_GERAR_APK.md](COMO_GERAR_APK.md)
 
 ---
 
@@ -260,10 +272,7 @@ Siga o roteiro em [TESTE_MANUAL_ATUALIZADO.md](TESTE_MANUAL_ATUALIZADO.md)
 ### Validação de Código
 
 ```bash
-# TypeScript
 npx tsc --noEmit
-
-# Lint
 npm run lint
 ```
 
@@ -272,21 +281,18 @@ npm run lint
 ## 📊 Endpoints da API
 
 ### GET /health
-Status da API
 
 ```bash
 curl https://PROJECT_REF.supabase.co/functions/v1/api/health
 ```
 
 ### GET /config
-Configurações da planilha (instrumentos, cidades, etc)
 
 ```bash
 curl https://PROJECT_REF.supabase.co/functions/v1/api/config
 ```
 
 ### POST /registros
-Criar novo registro
 
 ```bash
 curl -X POST https://PROJECT_REF.supabase.co/functions/v1/api/registros \
@@ -303,7 +309,6 @@ curl -X POST https://PROJECT_REF.supabase.co/functions/v1/api/registros \
 ```
 
 ### POST /registros/alerta
-Adicionar alerta a um registro
 
 ```bash
 curl -X POST https://PROJECT_REF.supabase.co/functions/v1/api/registros/alerta \
@@ -320,10 +325,10 @@ curl -X POST https://PROJECT_REF.supabase.co/functions/v1/api/registros/alerta \
 ## 🗂️ Formato da Planilha
 
 ### Aba "Base Geral"
-Configurações do sistema (instrumentos, cidades, ministérios, cargos)
+Configurações do sistema: instrumentos, cidades, ministérios e cargos.
 
 ### Aba "Dados Geral"
-Registros de lançamentos (colunas A-H):
+Registros de lançamentos nas colunas A-H.
 
 | Coluna | Conteúdo | Exemplo |
 |--------|----------|---------|
@@ -340,25 +345,46 @@ Registros de lançamentos (colunas A-H):
 
 ## 🤝 Contribuindo
 
-Contribuições são bem-vindas! Para contribuir:
+Contribuições são bem-vindas.
 
 1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
-3. Commit suas mudanças (`git commit -m 'feat: adicionar MinhaFeature'`)
-4. Push para a branch (`git push origin feature/MinhaFeature`)
+2. Crie uma branch para sua feature (`git checkout -b feature/minha-feature`)
+3. Commit suas mudanças (`git commit -m "feat: minha feature"`)
+4. Push para a branch (`git push origin feature/minha-feature`)
 5. Abra um Pull Request
 
-### Padrão de Commits
+### Padrão de commits
 
-Seguimos o [Conventional Commits](https://www.conventionalcommits.org/):
+Seguimos o padrão [Conventional Commits](https://www.conventionalcommits.org/):
 
-- `feat:` Nova funcionalidade
-- `fix:` Correção de bug
-- `docs:` Documentação
-- `style:` Formatação
-- `refactor:` Refatoração
-- `test:` Testes
-- `chore:` Manutenção
+- `feat:` nova funcionalidade
+- `fix:` correção de bug
+- `docs:` documentação
+- `style:` formatação
+- `refactor:` refatoração
+- `test:` testes
+- `chore:` manutenção
+
+---
+
+## 👨‍💻 Autor
+
+**Felipe Alirio Baruja**
+
+- GitHub: [@BarujaFe1](https://github.com/BarujaFe1)
+- LinkedIn: [linkedin.com/in/barujafe](https://www.linkedin.com/in/barujafe/)
+- Repositório do projeto: [LancaEnsaio](https://github.com/BarujaFe1/LancaEnsaio)
+
+---
+
+## 📞 Suporte
+
+Para dúvidas, melhorias ou problemas:
+
+1. Consulte a [documentação](docs/)
+2. Abra uma [issue](https://github.com/BarujaFe1/LancaEnsaio/issues)
+3. Acompanhe meu perfil no [LinkedIn](https://www.linkedin.com/in/barujafe/)
+4. Veja outros projetos no [GitHub](https://github.com/BarujaFe1)
 
 ---
 
@@ -368,33 +394,15 @@ Este projeto é de uso interno da organização.
 
 ---
 
-## 👥 Autores
-
-- **Desenvolvimento** - Sistema autônomo de desenvolvimento
-- **Organização** - CCB Orquestra
-
----
-
-## 🙏 Agradecimentos
-
-- Comunidade Expo
-- Equipe Supabase
-- Google Sheets API
-- Todos os músicos e cantores que utilizam o sistema
-
----
-
-## 📞 Suporte
-
-Para dúvidas ou problemas:
-
-1. Consulte a [documentação](docs/)
-2. Abra uma [issue](https://github.com/BarujaFe1/LancaEnsaio/issues)
-3. Entre em contato com o administrador
-
----
-
 <div align="center">
+
+Desenvolvido por **Felipe Alirio Baruja**
+
+<a href="https://github.com/BarujaFe1">GitHub</a> •
+<a href="https://www.linkedin.com/in/barujafe/">LinkedIn</a> •
+<a href="https://github.com/BarujaFe1/LancaEnsaio">Repositório</a>
+
+<br /><br />
 
 **Feito com ❤️ para a Orquestra**
 
