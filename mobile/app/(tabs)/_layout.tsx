@@ -58,26 +58,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="alert"
-        options={{
-          title: 'Alerta Manual',
-          tabBarLabel: 'Alerta',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="warning" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Configurações',
-          tabBarLabel: 'Ajustes',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings" size={size} color={color} />
-          ),
-        }}
-      />
     </Tabs>
   );
 }
