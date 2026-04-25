@@ -86,26 +86,31 @@ npx expo start
 
 ### Primeiro Uso
 
-#### Opção 1: Via Expo Go (Recomendado para Desenvolvimento)
-1. Abra o **Expo Go** no celular.
-2. Escaneie o QR Code que aparece no terminal.
-3. Na tela de setup:
+#### 📱 Instalação Rápida via Expo Go (Recomendado)
+1. Instale o **Expo Go** no celular:
+   - [Android](https://play.google.com/store/apps/details?id=host.exp.exponent)
+   - [iOS](https://apps.apple.com/app/expo-go/id982107779)
+2. Execute o projeto:
+   ```bash
+   cd mobile
+   npx expo start
+   ```
+3. Escaneie o QR Code com o Expo Go
+4. Na tela de setup:
    - Digite seu nome
    - Escolha o modo (Irmãos ou Irmãs)
    - Clique em **Salvar e Continuar**
-4. Pronto. Comece a lançar ensaios.
+5. Pronto! Comece a lançar ensaios.
 
-#### Opção 2: APK Standalone (Produção)
-Para gerar o APK instalável:
+#### 📦 APK Standalone (Opcional)
+Para gerar um APK instalável independente:
 
 ```bash
 cd mobile
 npx eas build --platform android --profile preview
 ```
 
-**Nota:** Build local requer macOS/Linux. No Windows, use o build na nuvem do EAS (gratuito).
-
-O APK será gerado e disponibilizado via link de download após o build completar (~10-15 minutos).
+**Nota:** O build será feito na nuvem do EAS (gratuito) e levará ~10-15 minutos. Você receberá um link para download do APK quando concluído.
 
 ---
 
