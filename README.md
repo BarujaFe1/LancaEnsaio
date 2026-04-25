@@ -86,7 +86,16 @@ npx expo start
 
 ### Primeiro Uso
 
-#### 📱 Instalação Rápida via Expo Go (Recomendado)
+#### 📦 Download Direto do APK
+
+**[⬇️ Baixar LançaEnsaio.apk (83 MB)](https://github.com/BarujaFe1/LancaEnsaio/raw/main/lancaensaio.apk)**
+
+1. Baixe o APK no link acima
+2. Instale no seu Android (habilite "Instalar de fontes desconhecidas" se necessário)
+3. Abra o app e faça o setup inicial
+4. Pronto para usar!
+
+#### 📱 Instalação via Expo Go (Desenvolvimento)
 1. Instale o **Expo Go** no celular:
    - [Android](https://play.google.com/store/apps/details?id=host.exp.exponent)
    - [iOS](https://apps.apple.com/app/expo-go/id982107779)
@@ -102,15 +111,15 @@ npx expo start
    - Clique em **Salvar e Continuar**
 5. Pronto! Comece a lançar ensaios.
 
-#### 📦 APK Standalone (Opcional)
-Para gerar um APK instalável independente:
+#### 🔨 Gerar Novo APK (Opcional)
+Para gerar um novo APK:
 
 ```bash
 cd mobile
 npx eas build --platform android --profile preview
 ```
 
-**Nota:** O build será feito na nuvem do EAS (gratuito) e levará ~10-15 minutos. Você receberá um link para download do APK quando concluído.
+**Nota:** O build será feito na nuvem do EAS (gratuito) e levará ~10-15 minutos.
 
 ---
 
