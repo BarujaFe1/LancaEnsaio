@@ -41,12 +41,14 @@
 - ✅ Escolha de instrumento específico
 - ✅ Registro de ministério e cargo musical
 - ✅ Lançamento com ID único
+- ✅ Padrão "Cantor" quando não seleciona instrumento/cargo
 
 ### Para Irmãs
-- ✅ Registro simplificado
-- ✅ Seleção de cargo musical
+- ✅ Registro simplificado (sem ministério)
+- ✅ Seleção de cargo musical (Organista, Instrutora, Examinadora)
 - ✅ Lançamento com ID único
 - ✅ Fluxo adaptado ao modo selecionado
+- ✅ Padrão "Cantora" quando não seleciona cargo
 
 ### Recursos Gerais
 - ⚠️ Sistema de alertas para registros existentes
@@ -54,6 +56,7 @@
 - 📍 Seleção de cidade/congregação
 - 💾 Persistência de preferências locais
 - 🎨 Interface adaptativa por modo
+- 📋 Comprovante visual do último lançamento
 
 ---
 
