@@ -2,12 +2,12 @@
 
 > Sistema unificado para lançamento de ensaios de Irmãos e Irmãs da Orquestra
 
-[![React Native](https://img.shields.io/badge/React%20Native-0.76-61DAFB?style=flat&logo=react)](https://reactnative.dev/)
+[![React Native](https://img.shields.io/badge/React%20Native-0.81-61DAFB?style=flat&logo=react)](https://reactnative.dev/)
 [![Expo](https://img.shields.io/badge/Expo-54-000020?style=flat&logo=expo)](https://expo.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-Edge%20Functions-3ECF8E?style=flat&logo=supabase)](https://supabase.com/)
-[![GitHub](https://img.shields.io/badge/GitHub-BarujaFe1-181717?style=flat&logo=github)](https://github.com/BarujaFe1)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-barujafe-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/barujafe/)
+[![GitHub](https://img.shields.io/badge/GitHub-BarujaFe1-181717?style=flat&logo=github)](https://github.com/BarujaFe1)
 
 <p align="center">
   <a href="https://github.com/BarujaFe1/LancaEnsaio">Repositório</a> •
@@ -16,6 +16,29 @@
   <a href="docs/">Documentação</a> •
   <a href="https://github.com/BarujaFe1/LancaEnsaio/issues">Issues</a>
 </p>
+
+---
+
+## 📱 Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/irmaos.png" alt="Modo Irmãos" width="250"/>
+  <img src="docs/screenshots/irmas.png" alt="Modo Irmãs" width="250"/>
+  <img src="docs/screenshots/lancamento.png" alt="Lançamento Realizado" width="250"/>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/setup.png" alt="Tela de Setup" width="250"/>
+  <img src="docs/screenshots/configuracoes.png" alt="Configurações" width="250"/>
+</p>
+
+---
+
+## 📦 Demo
+
+**[⬇️ Download APK v1.0.0](https://github.com/BarujaFe1/LancaEnsaio/releases/latest)**
+
+Baixe o APK e instale diretamente no seu Android. Não é necessário Expo Go.
 
 ---
 
@@ -28,9 +51,10 @@
 - 🎨 **Design Premium** — Interface escura moderna com tipografia refinada
 - 🔄 **Modo Unificado** — Suporte para Irmãos e Irmãs no mesmo app
 - ⚡ **Fluxo Simplificado** — Identificação rápida e lançamento direto
-- 📊 **Integração Google Sheets** — Dados sincronizados em tempo real
-- 🌐 **Backend Serverless** — Supabase Edge Functions
+- 📊 **Integração Google Sheets** — Dados sincronizados em tempo real via Sheets API v4
+- 🌐 **Backend Serverless** — Supabase Edge Functions (Deno)
 - 📱 **Experiência Mobile** — Feito para uso prático no dia a dia
+- 🔒 **Sem Autenticação** — Identificação simples por nome
 
 ---
 
@@ -62,13 +86,23 @@
 
 ## 🚀 Começando
 
-### Pré-requisitos
+### Opção 1: Download Direto do APK (Recomendado)
 
+**[⬇️ Download APK v1.0.0](https://github.com/BarujaFe1/LancaEnsaio/releases/latest)**
+
+1. Baixe o APK no link acima
+2. Instale no seu Android (habilite "Instalar de fontes desconhecidas" se necessário)
+3. Abra o app e faça o setup inicial
+4. Pronto para usar!
+
+### Opção 2: Instalação via Expo Go (Desenvolvimento)
+
+#### Pré-requisitos
 - Node.js 18+ instalado
 - Expo Go no celular ([Android](https://play.google.com/store/apps/details?id=host.exp.exponent) | [iOS](https://apps.apple.com/app/expo-go/id982107779))
 - Celular e computador na mesma rede Wi-Fi
 
-### Instalação Rápida
+#### Instalação
 
 ```bash
 # 1. Clone o repositório
@@ -80,61 +114,24 @@ cd LancaEnsaio/mobile
 # 3. Instale as dependências
 npm install
 
-# 4. Inicie o app
+# 4. Configure as variáveis de ambiente
+cp .env.example .env
+# Edite o .env com suas credenciais
+
+# 5. Inicie o app
 npx expo start
 ```
 
-### Primeiro Uso
+#### Primeiro Uso
 
-#### 📦 Download Direto do APK
-
-**[⬇️ Baixar LançaEnsaio.apk (83 MB)](https://github.com/BarujaFe1/LancaEnsaio/raw/main/lancaensaio.apk)**
-
-1. Baixe o APK no link acima
-2. Instale no seu Android (habilite "Instalar de fontes desconhecidas" se necessário)
-3. Abra o app e faça o setup inicial
-4. Pronto para usar!
-
-#### 📱 Instalação via Expo Go (Desenvolvimento)
-1. Instale o **Expo Go** no celular:
-   - [Android](https://play.google.com/store/apps/details?id=host.exp.exponent)
-   - [iOS](https://apps.apple.com/app/expo-go/id982107779)
-2. Execute o projeto:
-   ```bash
-   cd mobile
-   npx expo start
-   ```
+1. Instale o **Expo Go** no celular
+2. Execute o projeto: `npx expo start`
 3. Escaneie o QR Code com o Expo Go
 4. Na tela de setup:
    - Digite seu nome
    - Escolha o modo (Irmãos ou Irmãs)
    - Clique em **Salvar e Continuar**
 5. Pronto! Comece a lançar ensaios.
-
-#### 🔨 Gerar Novo APK (Opcional)
-Para gerar um novo APK:
-
-```bash
-cd mobile
-npx eas build --platform android --profile preview
-```
-
-**Nota:** O build será feito na nuvem do EAS (gratuito) e levará ~10-15 minutos.
-
----
-
-## 📖 Documentação
-
-### Guias Rápidos
-- [🚀 Comece Aqui](COMECE_AQUI.md) — Guia de início rápido
-- [📱 Teste Manual](TESTE_MANUAL_ATUALIZADO.md) — Roteiro de teste completo
-- [📦 Gerar APK](COMO_GERAR_APK.md) — Como gerar APK local
-- [🎨 Redesign v2.1](REDESIGN_V2.1.md) — Melhorias visuais
-
-### Documentação Técnica
-- [📋 Baseline Confirmada](docs/BASELINE_CONFIRMADA.md) — Evidências técnicas
-- [📊 Relatório de Execução](docs/RELATORIO_FINAL_EXECUCAO.md) — Relatório completo
-- [🔧 Correções v2.0](docs/RESUMO_CORRECOES_V2.md) — Histórico de correções
 
 ---
 
@@ -153,7 +150,7 @@ npx eas build --platform android --profile preview
 │   Functions     │  TypeScript
 └────────┬────────┘
          │
-         │ Google Sheets API
+         │ Google Sheets API v4
          ▼
 ┌─────────────────┐
 │ Google Sheets   │  Base Geral + Dados Geral
@@ -164,11 +161,12 @@ npx eas build --platform android --profile preview
 ### Stack Tecnológica
 
 **Frontend**
-- React Native 0.76
+- React Native 0.81
 - Expo 54
-- TypeScript 5.3
+- TypeScript 5.9
 - Expo Router
 - AsyncStorage
+- Zustand
 
 **Backend**
 - Supabase Edge Functions
@@ -235,6 +233,7 @@ LancaEnsaio/
 │   │   └── api/
 │   └── config.toml
 ├── docs/
+│   └── screenshots/
 ├── COMECE_AQUI.md
 └── README.md
 ```
@@ -245,7 +244,7 @@ LancaEnsaio/
 
 ### Variáveis de Ambiente
 
-Crie o arquivo `mobile/.env`:
+Crie o arquivo `mobile/.env` baseado no `.env.example`:
 
 ```env
 EXPO_PUBLIC_API_URL=https://SEU_PROJECT_REF.supabase.co/functions/v1/api
@@ -270,19 +269,21 @@ supabase functions deploy api --no-verify-jwt
 
 ## 📱 Gerar APK
 
-### Método 1: Build Local
+### Método 1: Build na Nuvem (Recomendado)
 
 ```bash
 cd mobile
-eas build --platform android --profile local --local
+npx eas build --platform android --profile preview
 ```
 
-### Método 2: Build na Nuvem
+### Método 2: Build Local
 
 ```bash
 cd mobile
-eas build --platform android --profile production
+npx eas build --platform android --profile preview --local
 ```
+
+**Nota:** O build na nuvem do EAS é gratuito e leva ~10-15 minutos.
 
 Veja também: [COMO_GERAR_APK.md](COMO_GERAR_APK.md)
 
