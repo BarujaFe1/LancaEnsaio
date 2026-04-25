@@ -86,6 +86,7 @@ npx expo start
 
 ### Primeiro Uso
 
+#### Opção 1: Via Expo Go (Recomendado para Desenvolvimento)
 1. Abra o **Expo Go** no celular.
 2. Escaneie o QR Code que aparece no terminal.
 3. Na tela de setup:
@@ -93,6 +94,18 @@ npx expo start
    - Escolha o modo (Irmãos ou Irmãs)
    - Clique em **Salvar e Continuar**
 4. Pronto. Comece a lançar ensaios.
+
+#### Opção 2: APK Standalone (Produção)
+Para gerar o APK instalável:
+
+```bash
+cd mobile
+npx eas build --platform android --profile preview
+```
+
+**Nota:** Build local requer macOS/Linux. No Windows, use o build na nuvem do EAS (gratuito).
+
+O APK será gerado e disponibilizado via link de download após o build completar (~10-15 minutos).
 
 ---
 
