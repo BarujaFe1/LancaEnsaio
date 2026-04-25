@@ -76,9 +76,10 @@ function auditarRegistro(dados: any) {
   const mus = dados.musicaCargo && dados.musicaCargo !== "-" ? dados.musicaCargo : "";
   const cid = dados.cidade && dados.cidade !== "-" ? dados.cidade : "";
 
-  // IRMÃS
+  // IRMÃS - sem ministério, apenas música/cargo (Organista, Instrutora, Examinadora)
   if (dados.tipo === "IRMAS") {
     if (!cid) return { cargoFinal: "-", statusAuditoria: "ERRO 01: 🏙️ Falta Cidade" };
+    // Se não selecionou cargo, é Cantora
     if (!mus) return { cargoFinal: "Cantora", statusAuditoria: "" };
     return { cargoFinal: mus, statusAuditoria: "" };
   }
@@ -86,7 +87,7 @@ function auditarRegistro(dados: any) {
   // IRMÃOS
   const isVazio = !cat && !inst && !min && !mus;
 
-  // regra default (irmão presente sem instrumento / sem cargo)
+  // Se não selecionou nada (sem instrumento e sem cargo), é Cantor
   if (isVazio) {
     if (cid) return { cargoFinal: "Cantor", statusAuditoria: "" };
     return { cargoFinal: "-", statusAuditoria: "ERRO 01: 🏙️ Falta Cidade" };

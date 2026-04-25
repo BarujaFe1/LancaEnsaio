@@ -41,6 +41,7 @@ export default function LaunchScreen() {
   const [musicaCargo, setMusicaCargo] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [ultimoId, setUltimoId] = useState<string | null>(null);
+  const [ultimoComprovante, setUltimoComprovante] = useState<any>(null);
   const [modoAlerta, setModoAlerta] = useState(false);
   const [textoAlerta, setTextoAlerta] = useState('');
 
@@ -94,7 +95,9 @@ export default function LaunchScreen() {
 
       const res = await api.post('/registros', payload);
       const id = res.data?.idGerado || 'SUCESSO';
+      const comprovante = res.data?.comprovante || null;
       setUltimoId(id);
+      setUltimoComprovante(comprovante);
       
       Alert.alert('✓ Lançamento Registrado', `ID: ${id}`, [{ text: 'OK' }]);
       
@@ -272,27 +275,31 @@ export default function LaunchScreen() {
                 </>
               )}
 
-              {/* Ministério */}
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>Ministério</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={ministerio}
-                    onValueChange={setMinisterio}
-                    style={styles.picker}
-                    dropdownIconColor="#34C759"
-                  >
-                    <Picker.Item label="Nenhum" value="" />
-                    {(config?.ministerios || []).map((m) => (
-                      <Picker.Item key={m} label={m} value={m} />
-                    ))}
-                  </Picker>
+              {/* Ministério - apenas para IRMÃOS */}
+              {isIrmaos && (
+                <View style={styles.fieldGroup}>
+                  <Text style={styles.label}>Ministério</Text>
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      selectedValue={ministerio}
+                      onValueChange={setMinisterio}
+                      style={styles.picker}
+                      dropdownIconColor="#34C759"
+                    >
+                      <Picker.Item label="Nenhum" value="" />
+                      {(config?.ministerios || []).map((m) => (
+                        <Picker.Item key={m} label={m} value={m} />
+                      ))}
+                    </Picker>
+                  </View>
                 </View>
-              </View>
+              )}
 
               {/* Música/Cargo */}
               <View style={styles.fieldGroup}>
-                <Text style={styles.label}>Música / Cargo</Text>
+                <Text style={styles.label}>
+                  {isIrmaos ? 'Música / Cargo' : 'Cargo Musical'}
+                </Text>
                 <View style={styles.pickerContainer}>
                   <Picker
                     selectedValue={musicaCargo}
@@ -300,7 +307,10 @@ export default function LaunchScreen() {
                     style={styles.picker}
                     dropdownIconColor="#34C759"
                   >
-                    <Picker.Item label="Nenhum" value="" />
+                    <Picker.Item 
+                      label={isIrmaos ? "Nenhum (Cantor)" : "Nenhum (Cantora)"} 
+                      value="" 
+                    />
                     {(config?.cargosMusicais || []).map((cargo) => (
                       <Picker.Item key={cargo} label={cargo} value={cargo} />
                     ))}
@@ -325,6 +335,48 @@ export default function LaunchScreen() {
                 )}
               </TouchableOpacity>
             </View>
+
+            {/* Comprovante do Último Lançamento */}
+            {ultimoComprovante && (
+              <View style={styles.comprovanteCard}>
+                <Text style={styles.comprovanteTitle}>📋 Último Lançamento</Text>
+                <View style={styles.comprovanteContent}>
+                  <View style={styles.comprovanteRow}>
+                    <Text style={styles.comprovanteLabel}>ID:</Text>
+                    <Text style={styles.comprovanteValue}>{ultimoComprovante.id}</Text>
+                  </View>
+                  <View style={styles.comprovanteRow}>
+                    <Text style={styles.comprovanteLabel}>Horário:</Text>
+                    <Text style={styles.comprovanteValue}>{ultimoComprovante.horario}</Text>
+                  </View>
+                  <View style={styles.comprovanteRow}>
+                    <Text style={styles.comprovanteLabel}>Cidade:</Text>
+                    <Text style={styles.comprovanteValue}>{ultimoComprovante.cidade}</Text>
+                  </View>
+                  {ultimoComprovante.instrumento && ultimoComprovante.instrumento !== '-' && (
+                    <View style={styles.comprovanteRow}>
+                      <Text style={styles.comprovanteLabel}>Instrumento:</Text>
+                      <Text style={styles.comprovanteValue}>{ultimoComprovante.instrumento}</Text>
+                    </View>
+                  )}
+                  {ultimoComprovante.ministerio && ultimoComprovante.ministerio !== '-' && (
+                    <View style={styles.comprovanteRow}>
+                      <Text style={styles.comprovanteLabel}>Ministério:</Text>
+                      <Text style={styles.comprovanteValue}>{ultimoComprovante.ministerio}</Text>
+                    </View>
+                  )}
+                  <View style={styles.comprovanteRow}>
+                    <Text style={styles.comprovanteLabel}>Cargo:</Text>
+                    <Text style={styles.comprovanteValue}>{ultimoComprovante.musica}</Text>
+                  </View>
+                  {ultimoComprovante.auditoria && (
+                    <View style={styles.comprovanteAuditoria}>
+                      <Text style={styles.comprovanteAuditoriaText}>{ultimoComprovante.auditoria}</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            )}
 
             {/* Botão de Alerta */}
             {ultimoId && (
@@ -599,5 +651,55 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     fontSize: 15,
     fontWeight: '600',
+  },
+
+  // Comprovante
+  comprovanteCard: {
+    backgroundColor: '#1A1D25',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(52, 199, 89, 0.3)',
+  },
+  comprovanteTitle: {
+    color: '#34C759',
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 16,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  comprovanteContent: {
+    gap: 12,
+  },
+  comprovanteRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  comprovanteLabel: {
+    color: '#9CA3AF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  comprovanteValue: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+    flex: 1,
+    textAlign: 'right',
+  },
+  comprovanteAuditoria: {
+    marginTop: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  comprovanteAuditoriaText: {
+    color: '#6B7280',
+    fontSize: 12,
+    fontWeight: '500',
+    fontStyle: 'italic',
   },
 });
