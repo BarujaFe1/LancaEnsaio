@@ -1,26 +1,128 @@
-# 🎵 LançaEnsaio
+<div align="center">
+  <img src="./icon.png" alt="LançaEnsaio Logo" width="120" height="120" />
 
-> Sistema unificado para lançamento de ensaios de Irmãos e Irmãs da Orquestra
+  <h1>LançaEnsaio</h1>
 
-[![React Native](https://img.shields.io/badge/React%20Native-0.81-61DAFB?style=flat&logo=react)](https://reactnative.dev/)
-[![Expo](https://img.shields.io/badge/Expo-54-000020?style=flat&logo=expo)](https://expo.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-Edge%20Functions-3ECF8E?style=flat&logo=supabase)](https://supabase.com/)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-barujafe-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/barujafe/)
-[![GitHub](https://img.shields.io/badge/GitHub-BarujaFe1-181717?style=flat&logo=github)](https://github.com/BarujaFe1)
+  <p><strong>Sistema unificado para lançamento de ensaios de Irmãos e Irmãs da Orquestra</strong></p>
+  <p><strong>Unified mobile system for orchestra rehearsal attendance registration</strong></p>
 
-<p align="center">
-  <a href="https://github.com/BarujaFe1/LancaEnsaio">Repositório</a> •
-  <a href="https://github.com/BarujaFe1">GitHub</a> •
-  <a href="https://www.linkedin.com/in/barujafe/">LinkedIn</a> •
-  <a href="docs/">Documentação</a> •
-  <a href="https://github.com/BarujaFe1/LancaEnsaio/issues">Issues</a>
-</p>
+  <p>
+    <a href="#pt-br">PT-BR</a> •
+    <a href="#en">English</a> •
+    <a href="#stack--tecnologias">Stack</a> •
+    <a href="#quick-start--início-rápido">Quick Start</a> •
+    <a href="#api">API</a> •
+    <a href="#autor--author">Autor</a>
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/badge/React%20Native-0.81-61DAFB.svg?logo=react&logoColor=white" alt="React Native 0.81" />
+    <img src="https://img.shields.io/badge/Expo-54-000020.svg?logo=expo&logoColor=white" alt="Expo 54" />
+    <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6.svg?logo=typescript&logoColor=white" alt="TypeScript 5.9" />
+    <img src="https://img.shields.io/badge/Supabase-Edge%20Functions-3ECF8E.svg?logo=supabase&logoColor=white" alt="Supabase Edge Functions" />
+    <img src="https://img.shields.io/badge/Google%20Sheets-API%20v4-34A853.svg?logo=googlesheets&logoColor=white" alt="Google Sheets API v4" />
+  </p>
+
+  <p>
+    <a href="https://github.com/BarujaFe1/LancaEnsaio"><strong>📦 Repositório</strong></a> •
+    <a href="https://github.com/BarujaFe1/LancaEnsaio/releases/latest"><strong>⬇️ Download APK</strong></a> •
+    <a href="https://barujafe.vercel.app/"><strong>🌐 Portfólio</strong></a>
+  </p>
+</div>
 
 ---
 
-## 📱 Screenshots
+<a id="pt-br"></a>
 
+## 🇧🇷 PT-BR
+
+## 📱 Visão geral
+
+**LançaEnsaio** é um aplicativo mobile moderno para lançamento de ensaios de **Irmãos e Irmãs da Orquestra**, com fluxo simples, visual premium e integração direta com Google Sheets via backend serverless.
+
+O app foi pensado para substituir registros manuais, reduzir atrito no lançamento de presença e organizar os dados em uma base centralizada, sem exigir login complexo ou operação técnica do usuário final.
+
+A proposta é clara: abrir o app, identificar o lançador, selecionar o modo correto, preencher os dados do ensaio e registrar tudo com rapidez, consistência e rastreabilidade.
+
+> **Objetivo:** tornar o lançamento de ensaios mais rápido, padronizado e confiável para uso prático no dia a dia.
+
+---
+
+## 🎯 Problema que resolve
+
+Registros manuais de ensaio tendem a gerar retrabalho, inconsistência e dificuldade de organização. Em contextos com diferentes categorias, cidades, instrumentos, cargos e modos de lançamento, é comum haver:
+
+- preenchimentos incompletos;
+- nomes e categorias com variações;
+- dificuldade para consolidar os dados;
+- registros duplicados ou confusos;
+- pouca rastreabilidade sobre quem lançou;
+- dependência de planilhas preenchidas manualmente.
+
+O **LançaEnsaio** resolve esse fluxo com uma interface mobile simples e uma API centralizada que grava os dados diretamente na planilha configurada.
+
+---
+
+## ✨ Funcionalidades principais
+
+### 🔄 Modo unificado
+
+O app suporta dois fluxos dentro da mesma experiência:
+
+- **Irmãos**
+- **Irmãs**
+
+Cada modo adapta campos, padrões e comportamento do lançamento conforme a necessidade.
+
+---
+
+### 👨‍🎼 Para Irmãos
+
+- Seleção de categoria:
+  - Cordas
+  - Metais
+  - Madeiras
+  - Teclas
+- Escolha de instrumento específico.
+- Registro de ministério e cargo musical.
+- Lançamento com ID único.
+- Padrão **Cantor** quando não há instrumento/cargo selecionado.
+- Fluxo completo para registros mais detalhados.
+
+---
+
+### 👩‍🎼 Para Irmãs
+
+- Registro simplificado.
+- Fluxo sem ministério.
+- Seleção de cargo musical:
+  - Organista
+  - Instrutora
+  - Examinadora
+- Lançamento com ID único.
+- Padrão **Cantora** quando não há cargo selecionado.
+- Experiência adaptada ao modo selecionado.
+
+---
+
+### 📲 Recursos gerais
+
+- Troca rápida entre modos.
+- Seleção de cidade/congregação.
+- Persistência local de preferências.
+- Sistema de alertas para registros existentes.
+- Comprovante visual do último lançamento.
+- Interface escura moderna e adaptativa.
+- Fluxo otimizado para uso mobile em campo.
+- APK instalável sem necessidade de Expo Go.
+
+---
+
+## 🖼️ Screenshots
+
+Adicione os arquivos em `docs/screenshots/` para exibir as telas no README:
+
+```md
 <p align="center">
   <img src="docs/screenshots/irmaos.png" alt="Modo Irmãos" width="250"/>
   <img src="docs/screenshots/irmas.png" alt="Modo Irmãs" width="250"/>
@@ -31,188 +133,194 @@
   <img src="docs/screenshots/setup.png" alt="Tela de Setup" width="250"/>
   <img src="docs/screenshots/configuracoes.png" alt="Configurações" width="250"/>
 </p>
-
----
-
-## 📦 Demo
-
-**[⬇️ Download APK v1.0.0](https://github.com/BarujaFe1/LancaEnsaio/releases/latest)**
-
-Baixe o APK e instale diretamente no seu Android. Não é necessário Expo Go.
-
----
-
-## 📱 Sobre o Projeto
-
-**LançaEnsaio** é um aplicativo mobile moderno e elegante para registro de presença em ensaios musicais. Desenvolvido com foco em simplicidade e usabilidade, permite que músicos e cantores registrem sua participação de forma rápida e intuitiva.
-
-### ✨ Características
-
-- 🎨 **Design Premium** — Interface escura moderna com tipografia refinada
-- 🔄 **Modo Unificado** — Suporte para Irmãos e Irmãs no mesmo app
-- ⚡ **Fluxo Simplificado** — Identificação rápida e lançamento direto
-- 📊 **Integração Google Sheets** — Dados sincronizados em tempo real via Sheets API v4
-- 🌐 **Backend Serverless** — Supabase Edge Functions (Deno)
-- 📱 **Experiência Mobile** — Feito para uso prático no dia a dia
-- 🔒 **Sem Autenticação** — Identificação simples por nome
-
----
-
-## 🎯 Funcionalidades
-
-### Para Irmãos
-- ✅ Seleção de categoria (Cordas, Metais, Madeiras, Teclas)
-- ✅ Escolha de instrumento específico
-- ✅ Registro de ministério e cargo musical
-- ✅ Lançamento com ID único
-- ✅ Padrão "Cantor" quando não seleciona instrumento/cargo
-
-### Para Irmãs
-- ✅ Registro simplificado (sem ministério)
-- ✅ Seleção de cargo musical (Organista, Instrutora, Examinadora)
-- ✅ Lançamento com ID único
-- ✅ Fluxo adaptado ao modo selecionado
-- ✅ Padrão "Cantora" quando não seleciona cargo
-
-### Recursos Gerais
-- ⚠️ Sistema de alertas para registros existentes
-- 🔄 Troca rápida entre modos (Irmãos / Irmãs)
-- 📍 Seleção de cidade/congregação
-- 💾 Persistência de preferências locais
-- 🎨 Interface adaptativa por modo
-- 📋 Comprovante visual do último lançamento
-
----
-
-## 🚀 Começando
-
-### Opção 1: Download Direto do APK (Recomendado)
-
-**[⬇️ Download APK v1.0.0](https://github.com/BarujaFe1/LancaEnsaio/releases/latest)**
-
-1. Baixe o APK no link acima
-2. Instale no seu Android (habilite "Instalar de fontes desconhecidas" se necessário)
-3. Abra o app e faça o setup inicial
-4. Pronto para usar!
-
-### Opção 2: Instalação via Expo Go (Desenvolvimento)
-
-#### Pré-requisitos
-- Node.js 18+ instalado
-- Expo Go no celular ([Android](https://play.google.com/store/apps/details?id=host.exp.exponent) | [iOS](https://apps.apple.com/app/expo-go/id982107779))
-- Celular e computador na mesma rede Wi-Fi
-
-#### Instalação
-
-```bash
-# 1. Clone o repositório
-git clone https://github.com/BarujaFe1/LancaEnsaio.git
-
-# 2. Acesse a pasta do projeto
-cd LancaEnsaio/mobile
-
-# 3. Instale as dependências
-npm install
-
-# 4. Configure as variáveis de ambiente
-cp .env.example .env
-# Edite o .env com suas credenciais
-
-# 5. Inicie o app
-npx expo start
 ```
 
-#### Primeiro Uso
+---
 
-1. Instale o **Expo Go** no celular
-2. Execute o projeto: `npx expo start`
-3. Escaneie o QR Code com o Expo Go
-4. Na tela de setup:
-   - Digite seu nome
-   - Escolha o modo (Irmãos ou Irmãs)
-   - Clique em **Salvar e Continuar**
-5. Pronto! Comece a lançar ensaios.
+<a id="en"></a>
+
+## 🇺🇸 English
+
+## 📱 Overview
+
+**LançaEnsaio** is a modern mobile application for registering rehearsal attendance for **orchestra brothers and sisters**, with a simple workflow, premium interface and direct Google Sheets integration through a serverless backend.
+
+The app was designed to replace manual registration, reduce friction in attendance logging and organize records in a centralized base, without requiring complex login or technical operation from the end user.
+
+The proposal is straightforward: open the app, identify the user, select the correct mode, fill in the rehearsal data and register everything quickly, consistently and traceably.
+
+> **Goal:** make rehearsal registration faster, more standardized and more reliable for practical daily use.
 
 ---
 
-## 🏗️ Arquitetura
+## 🎯 Problem solved
 
-```text
+Manual rehearsal records tend to create rework, inconsistency and organizational problems. In contexts with different categories, cities, instruments, roles and registration modes, it is common to face:
+
+- incomplete records;
+- inconsistent names and categories;
+- difficulty consolidating data;
+- duplicate or confusing entries;
+- little traceability about who registered the entry;
+- dependence on manually edited spreadsheets.
+
+**LançaEnsaio** solves this workflow with a simple mobile interface and a centralized API that writes data directly to the configured spreadsheet.
+
+---
+
+## ✨ Key features
+
+### 🔄 Unified mode
+
+The app supports two workflows inside the same experience:
+
+- **Brothers**
+- **Sisters**
+
+Each mode adapts fields, defaults and behavior according to the registration need.
+
+---
+
+### 👨‍🎼 For Brothers
+
+- Category selection:
+  - Strings
+  - Brass
+  - Woodwinds
+  - Keys
+- Specific instrument selection.
+- Ministry and musical role registration.
+- Unique ID generation.
+- Default **Singer** when no instrument/role is selected.
+- Complete flow for more detailed records.
+
+---
+
+### 👩‍🎼 For Sisters
+
+- Simplified registration.
+- Flow without ministry.
+- Musical role selection:
+  - Organist
+  - Instructor
+  - Examiner
+- Unique ID generation.
+- Default **Singer** when no role is selected.
+- Experience adapted to the selected mode.
+
+---
+
+### 📲 General resources
+
+- Quick mode switching.
+- City/congregation selection.
+- Local preference persistence.
+- Alert system for existing records.
+- Visual receipt for the last registration.
+- Modern adaptive dark interface.
+- Mobile-first workflow for field use.
+- Installable APK without requiring Expo Go.
+
+---
+
+## 🖼️ Screenshots
+
+Add files to `docs/screenshots/` to display the screens in the README:
+
+```md
+<p align="center">
+  <img src="docs/screenshots/irmaos.png" alt="Brothers Mode" width="250"/>
+  <img src="docs/screenshots/irmas.png" alt="Sisters Mode" width="250"/>
+  <img src="docs/screenshots/lancamento.png" alt="Registration Completed" width="250"/>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/setup.png" alt="Setup Screen" width="250"/>
+  <img src="docs/screenshots/configuracoes.png" alt="Settings" width="250"/>
+</p>
+```
+
+---
+
+<a id="stack--tecnologias"></a>
+
+## 🛠️ Stack / Tecnologias
+
+### Mobile
+
+- **React Native 0.81**
+- **Expo 54**
+- **TypeScript 5.9**
+- **Expo Router**
+- **AsyncStorage**
+- **Zustand**
+
+### Backend
+
+- **Supabase Edge Functions**
+- **Deno Runtime**
+- **TypeScript**
+- **Google Sheets API v4**
+- **Service Account Auth**
+
+### Infraestrutura
+
+- **Supabase**
+- **Google Cloud**
+- **GitHub**
+- **EAS Build**
+
+---
+
+## 🏗️ Arquitetura / Architecture
+
+```txt
 ┌─────────────────┐
-│   Mobile App    │  React Native + Expo
-│  (React Native) │  TypeScript
+│   Mobile App    │
+│ React Native    │
+│ Expo + TS       │
 └────────┬────────┘
          │
          │ HTTPS
          ▼
 ┌─────────────────┐
-│ Supabase Edge   │  Deno Runtime
-│   Functions     │  TypeScript
+│ Supabase Edge   │
+│ Functions       │
+│ Deno + TS       │
 └────────┬────────┘
          │
          │ Google Sheets API v4
          ▼
 ┌─────────────────┐
-│ Google Sheets   │  Base Geral + Dados Geral
-│   (Database)    │  Configurações + Registros
+│ Google Sheets   │
+│ Base Geral      │
+│ Dados Geral     │
 └─────────────────┘
 ```
 
-### Stack Tecnológica
+### Fluxo de dados / Data flow
 
-**Frontend**
-- React Native 0.81
-- Expo 54
-- TypeScript 5.9
-- Expo Router
-- AsyncStorage
-- Zustand
-
-**Backend**
-- Supabase Edge Functions
-- Deno Runtime
-- Google Sheets API v4
-- Service Account Auth
-
-**Infraestrutura**
-- Supabase
-- Google Cloud
-- GitHub
-
----
-
-## 🎨 Design System
-
-### Paleta de Cores
-
-```css
-/* Background */
---bg-primary: #0A0B0E;
---bg-card: #1A1D25;
---bg-field: #0F1115;
-
-/* Ações */
---primary: #34C759;
---warning: #FF9500;
-
-/* Texto */
---text-primary: #FFFFFF;
---text-secondary: #9CA3AF;
---text-label: #E5E7EB;
+```txt
+Usuário
+  ↓
+App Mobile
+  ↓
+API Supabase Edge Function
+  ↓
+Validação e normalização
+  ↓
+Google Sheets API v4
+  ↓
+Planilha central
+  ↓
+Comprovante visual no app
 ```
 
-### Tipografia
-
-- **Nome do usuário**: 28pt, weight 900
-- **Títulos de card**: 20pt, weight 800
-- **Labels**: 13pt, weight 700, uppercase
-- **Botões**: 17pt, weight 900
-
 ---
 
-## 📦 Estrutura do Projeto
+## 📁 Estrutura do projeto / Project structure
 
-```text
+```txt
 LancaEnsaio/
 ├── mobile/
 │   ├── app/
@@ -240,17 +348,76 @@ LancaEnsaio/
 
 ---
 
-## 🔧 Configuração
+<a id="quick-start--início-rápido"></a>
 
-### Variáveis de Ambiente
+## 🚀 Quick Start / Início rápido
 
-Crie o arquivo `mobile/.env` baseado no `.env.example`:
+### Opção 1 — Download direto do APK
+
+A forma mais simples de usar o app é instalar o APK no Android:
+
+[⬇️ Download APK v1.0.0](https://github.com/BarujaFe1/LancaEnsaio/releases/latest)
+
+1. Baixe o APK no link acima.
+2. No Android, habilite instalação de fontes desconhecidas, se necessário.
+3. Instale o arquivo.
+4. Abra o app.
+5. Faça o setup inicial.
+6. Comece a lançar ensaios.
+
+---
+
+### Opção 2 — Desenvolvimento com Expo Go
+
+#### Pré-requisitos
+
+- Node.js 18+
+- Expo Go no celular
+- Celular e computador na mesma rede Wi-Fi
+
+#### Instalação
+
+```bash
+# Clone the repository
+git clone https://github.com/BarujaFe1/LancaEnsaio.git
+
+# Enter mobile app
+cd LancaEnsaio/mobile
+
+# Install dependencies
+npm install
+
+# Configure environment variables
+cp .env.example .env
+
+# Start Expo
+npx expo start
+```
+
+#### Primeiro uso / First use
+
+1. Install Expo Go on the phone.
+2. Run `npx expo start`.
+3. Scan the QR Code.
+4. On setup:
+   - enter your name;
+   - choose mode: Irmãos or Irmãs;
+   - tap **Salvar e Continuar**.
+5. Start registering rehearsals.
+
+---
+
+## ⚙️ Configuração / Configuration
+
+### Variáveis de ambiente / Environment variables
+
+Create `mobile/.env` based on `.env.example`:
 
 ```env
 EXPO_PUBLIC_API_URL=https://SEU_PROJECT_REF.supabase.co/functions/v1/api
 ```
 
-### Secrets do Supabase
+### Supabase secrets
 
 ```bash
 supabase secrets set \
@@ -258,7 +425,7 @@ supabase secrets set \
   GOOGLE_SERVICE_ACCOUNT_B64="BASE64_DA_CREDENCIAL"
 ```
 
-### Deploy do Backend
+### Backend deploy
 
 ```bash
 cd supabase
@@ -267,40 +434,46 @@ supabase functions deploy api --no-verify-jwt
 
 ---
 
-## 📱 Gerar APK
+## 📱 Gerar APK / Generate APK
 
-### Método 1: Build na Nuvem (Recomendado)
+### Cloud build, recommended
 
 ```bash
 cd mobile
 npx eas build --platform android --profile preview
 ```
 
-### Método 2: Build Local
+### Local build
 
 ```bash
 cd mobile
 npx eas build --platform android --profile preview --local
 ```
 
-**Nota:** O build na nuvem do EAS é gratuito e leva ~10-15 minutos.
+See also:
 
-Veja também: [COMO_GERAR_APK.md](COMO_GERAR_APK.md)
+```txt
+COMO_GERAR_APK.md
+```
 
 ---
 
-## 🧪 Testes
+## 🧪 Testes / Testing
 
-### Teste Manual
+### Teste manual / Manual test
 
 ```bash
 cd mobile
 npx expo start
 ```
 
-Siga o roteiro em [TESTE_MANUAL_ATUALIZADO.md](TESTE_MANUAL_ATUALIZADO.md)
+Follow the manual testing guide:
 
-### Validação de Código
+```txt
+TESTE_MANUAL_ATUALIZADO.md
+```
+
+### Code validation
 
 ```bash
 npx tsc --noEmit
@@ -309,21 +482,23 @@ npm run lint
 
 ---
 
-## 📊 Endpoints da API
+<a id="api"></a>
 
-### GET /health
+## 🔗 API
+
+### GET `/health`
 
 ```bash
 curl https://PROJECT_REF.supabase.co/functions/v1/api/health
 ```
 
-### GET /config
+### GET `/config`
 
 ```bash
 curl https://PROJECT_REF.supabase.co/functions/v1/api/config
 ```
 
-### POST /registros
+### POST `/registros`
 
 ```bash
 curl -X POST https://PROJECT_REF.supabase.co/functions/v1/api/registros \
@@ -339,7 +514,7 @@ curl -X POST https://PROJECT_REF.supabase.co/functions/v1/api/registros \
   }'
 ```
 
-### POST /registros/alerta
+### POST `/registros/alerta`
 
 ```bash
 curl -X POST https://PROJECT_REF.supabase.co/functions/v1/api/registros/alerta \
@@ -353,16 +528,23 @@ curl -X POST https://PROJECT_REF.supabase.co/functions/v1/api/registros/alerta \
 
 ---
 
-## 🗂️ Formato da Planilha
+## 🗂️ Formato da planilha / Spreadsheet format
 
-### Aba "Base Geral"
-Configurações do sistema: instrumentos, cidades, ministérios e cargos.
+### Aba `Base Geral`
 
-### Aba "Dados Geral"
-Registros de lançamentos nas colunas A-H.
+Configurações do sistema:
+
+- instrumentos;
+- cidades;
+- ministérios;
+- cargos.
+
+### Aba `Dados Geral`
+
+Registros de lançamento nas colunas A-H.
 
 | Coluna | Conteúdo | Exemplo |
-|--------|----------|---------|
+|---|---|---|
 | A | Horário | `18:30 - 24/04/2026` |
 | B | ID | `MJOA1234` ou `F1234` |
 | C | Categoria | `Metais` ou `-` |
@@ -374,69 +556,90 @@ Registros de lançamentos nas colunas A-H.
 
 ---
 
-## 🤝 Contribuindo
+## 🎨 Design System
+
+### Paleta de cores / Color palette
+
+```css
+--bg-primary: #0A0B0E;
+--bg-card: #1A1D25;
+--bg-field: #0F1115;
+
+--primary: #34C759;
+--warning: #FF9500;
+
+--text-primary: #FFFFFF;
+--text-secondary: #9CA3AF;
+--text-label: #E5E7EB;
+```
+
+### Tipografia / Typography
+
+- **Nome do usuário / User name:** 28pt, weight 900
+- **Títulos de card / Card titles:** 20pt, weight 800
+- **Labels:** 13pt, weight 700, uppercase
+- **Botões / Buttons:** 17pt, weight 900
+
+---
+
+## 🤝 Contribuição / Contributing
 
 Contribuições são bem-vindas.
 
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/minha-feature`)
-3. Commit suas mudanças (`git commit -m "feat: minha feature"`)
-4. Push para a branch (`git push origin feature/minha-feature`)
-5. Abra um Pull Request
+```bash
+git checkout -b feature/minha-feature
+git commit -m "feat: minha feature"
+git push origin feature/minha-feature
+```
 
-### Padrão de commits
+Then open a Pull Request.
 
-Seguimos o padrão [Conventional Commits](https://www.conventionalcommits.org/):
+### Padrão de commits / Commit pattern
 
-- `feat:` nova funcionalidade
-- `fix:` correção de bug
-- `docs:` documentação
-- `style:` formatação
-- `refactor:` refatoração
-- `test:` testes
-- `chore:` manutenção
-
----
-
-## 👨‍💻 Autor
-
-**Felipe Alirio Baruja**
-
-- GitHub: [@BarujaFe1](https://github.com/BarujaFe1)
-- LinkedIn: [linkedin.com/in/barujafe](https://www.linkedin.com/in/barujafe/)
-- Repositório do projeto: [LancaEnsaio](https://github.com/BarujaFe1/LancaEnsaio)
+- `feat:` nova funcionalidade / new feature
+- `fix:` correção de bug / bug fix
+- `docs:` documentação / documentation
+- `style:` formatação / formatting
+- `refactor:` refatoração / refactor
+- `test:` testes / tests
+- `chore:` manutenção / maintenance
 
 ---
 
-## 📞 Suporte
+## 📞 Suporte / Support
 
-Para dúvidas, melhorias ou problemas:
+For questions, improvements or issues:
 
-1. Consulte a [documentação](docs/)
-2. Abra uma [issue](https://github.com/BarujaFe1/LancaEnsaio/issues)
-3. Acompanhe meu perfil no [LinkedIn](https://www.linkedin.com/in/barujafe/)
-4. Veja outros projetos no [GitHub](https://github.com/BarujaFe1)
+1. Consulte a documentação em `docs/`.
+2. Abra uma issue no repositório.
+3. Acompanhe o autor no LinkedIn.
+4. Veja outros projetos no GitHub.
 
 ---
 
-## 📝 Licença
+<a id="autor--author"></a>
+
+## 👤 Autor / Author
+
+Developed by **Felipe Alirio Baruja**.
+
+- **Portfolio:** [https://barujafe.vercel.app/](https://barujafe.vercel.app/)
+- **GitHub:** [github.com/BarujaFe1](https://github.com/BarujaFe1)
+- **LinkedIn:** [linkedin.com/in/barujafe](https://www.linkedin.com/in/barujafe/)
+- **Repository:** [github.com/BarujaFe1/LancaEnsaio](https://github.com/BarujaFe1/LancaEnsaio)
+
+---
+
+## 📝 Licença / License
 
 Este projeto é de uso interno da organização.
+
+This project is intended for internal organizational use.
 
 ---
 
 <div align="center">
-
-Desenvolvido por **Felipe Alirio Baruja**
-
-<a href="https://github.com/BarujaFe1">GitHub</a> •
-<a href="https://www.linkedin.com/in/barujafe/">LinkedIn</a> •
-<a href="https://github.com/BarujaFe1/LancaEnsaio">Repositório</a>
-
-<br /><br />
-
-**Feito com ❤️ para a Orquestra**
-
-[⬆ Voltar ao topo](#-lançaensaio)
-
+  <p><strong>LançaEnsaio</strong></p>
+  <p>Feito com ❤️ para a Orquestra.</p>
+  <p><em>Built with care for orchestra rehearsal workflows.</em></p>
 </div>
