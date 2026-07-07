@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { getPrefs, savePrefs, clearPrefs, UserPrefs } from '../../src/session';
 import { api } from '../../src/api';
+import { isDemo } from '../../src/backend';
 
 export default function SettingsScreen() {
   const [prefs, setPrefs] = useState<UserPrefs>({ nomeLancador: '', tipoSelecionado: null });
@@ -92,7 +93,7 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>Infraestrutura</Text>
           <Text style={styles.label}>Endpoint da API</Text>
           <View style={styles.infoBox}>
-            <Text style={styles.infoText} numberOfLines={1}>{api.defaults.baseURL}</Text>
+            {isDemo() ? 'Modo Demo (sem backend) — dados simulados' : api.defaults.baseURL}
           </View>
         </View>
 

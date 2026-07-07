@@ -14,7 +14,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { api } from '../../src/api';
+import { getConfig, enviarRegistro, enviarAlerta } from '../../src/backend';
 import { getPrefs, savePrefs } from '../../src/session';
 
 type ConfigData = {
@@ -50,8 +50,8 @@ export default function LaunchScreen() {
       const p = await getPrefs();
       setPrefs(p);
 
-      const res = await api.get('/config');
-      setConfig(res.data);
+      const cfg = await getConfig();
+      setConfig(cfg);
     } catch (err) {
       console.error(err);
       Alert.alert('Erro', 'Não foi possível carregar as configurações.');
@@ -93,9 +93,7 @@ export default function LaunchScreen() {
         musicaCargo,
       };
 
-      const res = await api.post('/registros', payload);
-      const id = res.data?.idGerado || 'SUCESSO';
-      const comprovante = res.data?.comprovante || null;
+      const { idGerado: id, comprovante } = await enviarRegistro(payload);
       setUltimoId(id);
       setUltimoComprovante(comprovante);
       
@@ -127,7 +125,7 @@ export default function LaunchScreen() {
 
     setEnviando(true);
     try {
-      await api.post('/registros/alerta', {
+      await enviarAlerta({
         id: ultimoId,
         aviso: textoAlerta.trim(),
         nomeLancador: prefs.nomeLancador,
