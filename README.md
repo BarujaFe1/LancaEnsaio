@@ -21,11 +21,13 @@
     <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6.svg?logo=typescript&logoColor=white" alt="TypeScript 5.9" />
     <img src="https://img.shields.io/badge/Supabase-Edge%20Functions-3ECF8E.svg?logo=supabase&logoColor=white" alt="Supabase Edge Functions" />
     <img src="https://img.shields.io/badge/Google%20Sheets-API%20v4-34A853.svg?logo=googlesheets&logoColor=white" alt="Google Sheets API v4" />
+    <img src="https://img.shields.io/badge/Vercel-Deploy-000000.svg?logo=vercel&logoColor=white" alt="Vercel Deploy" />
   </p>
 
   <p>
     <a href="https://github.com/BarujaFe1/LancaEnsaio"><strong>📦 Repositório</strong></a> •
     <a href="https://github.com/BarujaFe1/LancaEnsaio/releases/latest"><strong>⬇️ Download APK</strong></a> •
+    <a href="https://lancaensaio.vercel.app"><strong>🌐 Web Demo</strong></a> •
     <a href="https://barujafe.vercel.app/"><strong>🌐 Portfólio</strong></a>
   </p>
 </div>
@@ -102,6 +104,25 @@ Cada modo adapta campos, padrões e comportamento do lançamento conforme a nece
 - Lançamento com ID único.
 - Padrão **Cantora** quando não há cargo selecionado.
 - Experiência adaptada ao modo selecionado.
+
+---
+
+### 🌐 Web Demo — Testar no navegador
+
+O LançaEnsaio também está disponível como **site web estático** (Expo Web) para teste imediato, sem instalar nada:
+
+**[https://lancaensaio.vercel.app](https://lancaensaio.vercel.app)**
+
+- Modo demonstração com dados mockados (cidades, instrumentos, ministérios, cargos musicais).
+- Fluxo completo: setup → lançamento → comprovante → alerta.
+- Persistência local (AsyncStorage) — histórico sobrevive a recargas.
+- Header profissional com badges (React Native, Expo, Supabase, TypeScript) e links para portfólio/GitHub.
+- Build estático na Vercel com `expo export --platform web` e SPA rewrite.
+- Nenhum backend real necessário — ideal para recrutadores e avaliadores.
+
+```txt
+portfolio-project-handoff.md  →  Documentação completa de handoff do deploy web
+```
 
 ---
 
@@ -210,6 +231,25 @@ Each mode adapts fields, defaults and behavior according to the registration nee
 
 ---
 
+### 🌐 Web Demo — Test in browser
+
+LançaEnsaio is also available as a **static web site** (Expo Web) for immediate testing, no installation required:
+
+**[https://lancaensaio.vercel.app](https://lancaensaio.vercel.app)**
+
+- Demo mode with mock data (cities, instruments, ministries, musical roles).
+- Complete flow: setup → registration → receipt → alert.
+- Local persistence (AsyncStorage) — history survives page reloads.
+- Professional header with badges (React Native, Expo, Supabase, TypeScript) and portfolio/GitHub links.
+- Static build on Vercel with `expo export --platform web` and SPA rewrite.
+- No real backend needed — ideal for recruiters and evaluators.
+
+```txt
+portfolio-project-handoff.md  →  Complete handoff documentation for the web deploy
+```
+
+---
+
 ### 📲 General resources
 
 - Quick mode switching.
@@ -252,6 +292,7 @@ Add files to `docs/screenshots/` to display the screens in the README:
 - **Expo 54**
 - **TypeScript 5.9**
 - **Expo Router**
+- **React Native Web** (export web)
 - **AsyncStorage**
 - **Zustand**
 
@@ -267,6 +308,7 @@ Add files to `docs/screenshots/` to display the screens in the README:
 
 - **Supabase**
 - **Google Cloud**
+- **Vercel** (web static deploy + SPA rewrite)
 - **GitHub**
 - **EAS Build**
 
@@ -275,11 +317,11 @@ Add files to `docs/screenshots/` to display the screens in the README:
 ## 🏗️ Arquitetura / Architecture
 
 ```txt
-┌─────────────────┐
-│   Mobile App    │
-│ React Native    │
-│ Expo + TS       │
-└────────┬────────┘
+┌─────────────────┐     ┌───────────────────────┐
+│   Mobile App    │     │   Web Demo (Static)    │
+│ React Native    │     │   Expo Web + Vercel    │
+│ Expo + TS       │     │   modo demo local      │
+└────────┬────────┘     └───────────────────────┘
          │
          │ HTTPS
          ▼
@@ -331,7 +373,11 @@ LancaEnsaio/
 │   │   └── _layout.tsx
 │   ├── src/
 │   │   ├── api.ts
-│   │   └── session.ts
+│   │   ├── backend.ts        ← Modo demo / abstração de backend
+│   │   ├── session.ts
+│   │   ├── components/
+│   │   │   └── WebSiteHeader.tsx  ← Header web com badges e links
+│   │   └── constants/
 │   ├── assets/
 │   ├── .env
 │   ├── app.json
@@ -342,7 +388,9 @@ LancaEnsaio/
 │   └── config.toml
 ├── docs/
 │   └── screenshots/
+├── vercel.json               ← Config de build e deploy Vercel
 ├── COMECE_AQUI.md
+├── portfolio-project-handoff.md  ← Documentação de handoff do deploy web
 └── README.md
 ```
 

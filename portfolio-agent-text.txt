@@ -1,0 +1,81 @@
+TEXTO PARA ENVIAR À IDE DO PORTFÓLIO
+
+INSTRUÇÃO: Adicione o projeto LançaEnsaio (versão web demo) ao portfólio https://barujafe.vercel.app/ seguindo rigorosamente o padrão visual e estrutural já existente no site. Não altere nenhum outro projeto, seção ou layout do portfólio.
+
+---
+
+DADOS DO PROJETO
+
+Nome do projeto: LançaEnsaio
+Descrição curta: App mobile para registro padronizado de ensaios musicais — versão web demo testável no navegador, sem backend.
+Descrição média: App mobile construído com React Native e Expo que substitui fichas físicas de ensaio por lançamento rápido e rastreável. Esta versão web demo dispensa backend, simulando todo o fluxo de configuração, lançamento, comprovante e alerta diretamente no navegador com dados mockados e persistência local. Deploy estático na Vercel com SPA rewrite.
+Stack: TypeScript, React Native, Expo, Supabase, AsyncStorage, Vercel
+Status: Em produção / Publicado
+URL da demo: https://lancaensaio.vercel.app
+URL do repositório: https://github.com/BarujaFe1/LancaEnsaio
+Categoria: Mobile Web / Demo
+
+Bullets de destaque (4 itens):
+- Substituiu fichas físicas de ensaio que se perdiam ou atrasavam por fluxo digital rastreável
+- Adaptado de APK Android para web estática sem reescrever (~95% de código compartilhado)
+- Modo demo autossuficiente com dados mockados, persistência local (AsyncStorage) e comprovante
+- Publicado na Vercel com build customizado (expo export --platform web) e rewrite SPA
+
+Tags: TypeScript, React Native, Expo, Supabase, Vercel
+
+---
+
+INSTRUÇÕES DE EXECUÇÃO
+
+1. Acesse o repositório do portfólio e analise o código-fonte em https://barujafe.vercel.app/projetos e na página inicial.
+
+2. IDENTIFIQUE o padrão dos cards de projeto já existentes. Exemplos reais no site:
+   - Card DataFlow: subtítulo "PROJETO ÂNCORA · DATA QUALITY · RESPONSIBLE ANALYTICS", botão "Ver case study completo", "Abrir demo" (link externo), "GitHub"
+   - Card Maestro: subtítulo "Analytics operacional e gestão pedagógica · Em produção · 5 meses", botão "GitHub"
+   - Card LançaEnsaio (existente): subtítulo "Automação operacional e dados padronizados · Em produção", descrição em parágrafo, 4 bullets, tags de tecnologia, botão "GitHub"
+
+3. ATUALIZE o card existente do LançaEnsaio (não crie um novo). O card já existe na página inicial (seção "Projetos Selecionados") e na página /projetos. As alterações necessárias são:
+   - ADICIONAR um botão "Abrir demo" linkando para https://lancaensaio.vercel.app ao lado do botão "GitHub" existente
+   - ATUALIZAR a descrição para mencionar que agora há uma versão web demo disponível (mantenha o parágrafo original e adicione ou ajuste uma frase)
+   - ADICIONAR o bullet "Versão web demo disponível para teste no navegador" aos bullets existentes
+   - MANTER inalterados: título, subtítulo status "Em produção", imagem, demais bullets, tags de tecnologia, layout, cores, tipografia
+
+4. Padrão visual a ser seguido (observado no site):
+   - Cards em grid responsivo com imagem à direita e conteúdo à esquerda
+   - Tags de tecnologia em formato inline code (ex: `TypeScript` `React Native` `Expo`)
+   - Bullets com ícone de check ou traço
+   - Botões com cor verde (#34C759) ou outline
+   - Subtítulo em caixa alta ou com bullets separadores
+   - Imagem existente: /projects/lanca-ensaio.png (mantenha)
+
+5. Se não encontrar o card existente (criação do zero), siga o template exato usado no card do StatLab Experiments como referência:
+   - Subtítulo descritivo
+   - Status badge
+   - Título ###
+   - Parágrafo descritivo (2-3 frases)
+   - 4 bullets
+   - Tags inline code
+   - Botões "Abrir demo" e "GitHub"
+   - Imagem responsiva
+
+6. VALIDAÇÕES OBRIGATÓRIAS:
+   - A demo URL https://lancaensaio.vercel.app deve estar funcional e acessível
+   - O card deve ter o mesmo padding, border-radius, sombra e tipografia dos demais
+   - A página não deve quebrar visualmente em mobile ou desktop
+   - Nenhum texto de outros projetos deve ser alterado
+   - O layout geral do portfólio (header, hero, seções, footer) deve permanecer idêntico
+
+7. NÃO FAÇA:
+   - Não redesenhe ou reestruture o portfólio
+   - Não altere cores, fontes, espaçamentos ou identidade visual
+   - Não remova ou modifique textos de outros projetos
+   - Não adicione seções novas
+   - Não mude o sistema de navegação
+   - Não altere o tema (dark/light)
+   - Não adicione animações ou interações que não existem nos outros cards
+
+8. APÓS FINALIZAR:
+   - Verifique responsividade em 375px, 768px e 1440px
+   - Confirme que o link "Abrir demo" abre em nova aba
+   - Confirme que o link do GitHub abre em nova aba
+   - Faça deploy e confirme que o card aparece corretamente
