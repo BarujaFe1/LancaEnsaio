@@ -8,10 +8,10 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { savePrefs } from '../src/session';
+import { notify } from '../src/utils/notify';
 
 export default function SetupScreen() {
   const router = useRouter();
@@ -21,11 +21,11 @@ export default function SetupScreen() {
   const handleSalvar = async () => {
     const nomeLimpo = nome.trim();
     if (!nomeLimpo) {
-      Alert.alert('Faltou o nome', 'Por favor, digite seu nome para continuar.');
+      notify('Faltou o nome', 'Por favor, digite seu nome para continuar.');
       return;
     }
     if (!tipo) {
-      Alert.alert('Faltou o tipo', 'Por favor, selecione se vai lançar ensaios de Irmãos ou Irmãs.');
+      notify('Faltou o tipo', 'Por favor, selecione se vai lançar ensaios de Irmãos ou Irmãs.');
       return;
     }
 

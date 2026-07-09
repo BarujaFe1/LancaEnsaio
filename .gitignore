@@ -52,3 +52,5 @@ _scan_output/
 # Lock files (mantemos apenas no mobile)
 package-lock.json
 yarn.lock
+.vercel
+.env*

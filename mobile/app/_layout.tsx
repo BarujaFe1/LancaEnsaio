@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { getPrefs, subscribePrefs, UserPrefs } from '../src/session';
+import { WebSiteHeader } from '../src/components/WebSiteHeader';
 
 export default function RootLayout() {
   const router = useRouter();
@@ -41,10 +42,13 @@ export default function RootLayout() {
 
   return (
     <View style={styles.root}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="setup" />
-        <Stack.Screen name="(tabs)" />
-      </Stack>
+      <WebSiteHeader />
+      <View style={styles.app}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="setup" />
+          <Stack.Screen name="(tabs)" />
+        </Stack>
+      </View>
 
       {!ready ? (
         <View style={styles.loadingOverlay}>
@@ -56,7 +60,8 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0F1115' },
+  root: { flex: 1, backgroundColor: '#0F1115', flexDirection: 'column' },
+  app: { flex: 1 },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',

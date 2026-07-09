@@ -2,7 +2,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -13,22 +12,22 @@ import {
   View,
   RefreshControl,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { api } from '../../src/api';
-import { getPrefs, savePrefs } from '../../src/session';
-
-type ConfigData = {
-  instrumentos: Record<string, string[]>;
-  cidades: string[];
-  ministerios: string[];
-  cargosMusicais: string[];
-};
+import {
+  getConfig,
+  enviarRegistro,
+  enviarAlerta,
+  type ConfigData,
+  type Comprovante,
+} from '../../src/backend';
+import { AppPicker } from '../../src/components/AppPicker';
+import { getPrefs, savePrefs, type UserPrefs } from '../../src/session';
+import { notify } from '../../src/utils/notify';
 
 export default function LaunchScreen() {
   const [config, setConfig] = useState<ConfigData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [prefs, setPrefs] = useState<{ nomeLancador: string; tipoSelecionado: string | null }>({
+  const [prefs, setPrefs] = useState<UserPrefs>({
     nomeLancador: '',
     tipoSelecionado: null,
   });
@@ -41,7 +40,7 @@ export default function LaunchScreen() {
   const [musicaCargo, setMusicaCargo] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [ultimoId, setUltimoId] = useState<string | null>(null);
-  const [ultimoComprovante, setUltimoComprovante] = useState<any>(null);
+  const [ultimoComprovante, setUltimoComprovante] = useState<Comprovante | null>(null);
   const [modoAlerta, setModoAlerta] = useState(false);
   const [textoAlerta, setTextoAlerta] = useState('');
 
@@ -50,11 +49,11 @@ export default function LaunchScreen() {
       const p = await getPrefs();
       setPrefs(p);
 
-      const res = await api.get('/config');
-      setConfig(res.data);
+      const cfg = await getConfig();
+      setConfig(cfg);
     } catch (err) {
       console.error(err);
-      Alert.alert('Erro', 'Não foi possível carregar as configurações.');
+      notify('Erro', 'Não foi possível carregar as configurações.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -77,7 +76,7 @@ export default function LaunchScreen() {
 
   const handleLancar = async () => {
     if (!cidade) {
-      Alert.alert('Atenção', 'Selecione a cidade.');
+      notify('Atenção', 'Selecione a cidade.');
       return;
     }
 
@@ -93,22 +92,21 @@ export default function LaunchScreen() {
         musicaCargo,
       };
 
-      const res = await api.post('/registros', payload);
-      const id = res.data?.idGerado || 'SUCESSO';
-      const comprovante = res.data?.comprovante || null;
+      const { idGerado: id, comprovante } = await enviarRegistro(payload);
       setUltimoId(id);
       setUltimoComprovante(comprovante);
-      
-      Alert.alert('✓ Lançamento Registrado', `ID: ${id}`, [{ text: 'OK' }]);
-      
+
+      notify('✓ Lançamento Registrado', `ID: ${id}`);
+
       // Limpar campos secundários mas manter cidade por conveniência
       setCategoria('');
       setInstrumento('');
       setMinisterio('');
       setMusicaCargo('');
-    } catch (err: any) {
-      const msg = err?.response?.data?.erro || err?.message || 'Falha ao enviar registro.';
-      Alert.alert('Erro', msg);
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { erro?: string } }; message?: string };
+      const msg = axiosErr?.response?.data?.erro || axiosErr?.message || 'Falha ao enviar registro.';
+      notify('Erro', msg);
     } finally {
       setEnviando(false);
     }
@@ -116,29 +114,30 @@ export default function LaunchScreen() {
 
   const handleAlertar = async () => {
     if (!ultimoId) {
-      Alert.alert('Atenção', 'Nenhum lançamento recente para alertar.');
+      notify('Atenção', 'Nenhum lançamento recente para alertar.');
       return;
     }
 
     if (!textoAlerta.trim()) {
-      Alert.alert('Atenção', 'Digite o texto do alerta.');
+      notify('Atenção', 'Digite o texto do alerta.');
       return;
     }
 
     setEnviando(true);
     try {
-      await api.post('/registros/alerta', {
+      await enviarAlerta({
         id: ultimoId,
         aviso: textoAlerta.trim(),
         nomeLancador: prefs.nomeLancador,
       });
 
-      Alert.alert('✓ Alerta Adicionado', `Registro ${ultimoId} atualizado.`);
+      notify('✓ Alerta Adicionado', `Registro ${ultimoId} atualizado.`);
       setTextoAlerta('');
       setModoAlerta(false);
-    } catch (err: any) {
-      const msg = err?.response?.data?.erro || err?.message || 'Falha ao enviar alerta.';
-      Alert.alert('Erro', msg);
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { erro?: string } }; message?: string };
+      const msg = axiosErr?.response?.data?.erro || axiosErr?.message || 'Falha ao enviar alerta.';
+      notify('Erro', msg);
     } finally {
       setEnviando(false);
     }
@@ -216,19 +215,14 @@ export default function LaunchScreen() {
               {/* Cidade */}
               <View style={styles.fieldGroup}>
                 <Text style={styles.label}>Cidade *</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={cidade}
-                    onValueChange={setCidade}
-                    style={styles.picker}
-                    dropdownIconColor="#34C759"
-                  >
-                    <Picker.Item label="Selecione a cidade..." value="" />
-                    {(config?.cidades || []).map((c) => (
-                      <Picker.Item key={c} label={c} value={c} />
-                    ))}
-                  </Picker>
-                </View>
+                <AppPicker
+                  selectedValue={cidade}
+                  onValueChange={setCidade}
+                  options={[
+                    { label: 'Selecione a cidade...', value: '' },
+                    ...(config?.cidades || []).map((c) => ({ label: c, value: c })),
+                  ]}
+                />
               </View>
 
               {/* Campos específicos para IRMÃOS */}
@@ -236,40 +230,33 @@ export default function LaunchScreen() {
                 <>
                   <View style={styles.fieldGroup}>
                     <Text style={styles.label}>Categoria</Text>
-                    <View style={styles.pickerContainer}>
-                      <Picker
-                        selectedValue={categoria}
-                        onValueChange={(val) => {
-                          setCategoria(val);
-                          setInstrumento('');
-                        }}
-                        style={styles.picker}
-                        dropdownIconColor="#34C759"
-                      >
-                        <Picker.Item label="Nenhuma (Canto)" value="" />
-                        {Object.keys(config?.instrumentos || {}).map((cat) => (
-                          <Picker.Item key={cat} label={cat} value={cat} />
-                        ))}
-                      </Picker>
-                    </View>
+                    <AppPicker
+                      selectedValue={categoria}
+                      onValueChange={(val) => {
+                        setCategoria(val);
+                        setInstrumento('');
+                      }}
+                      options={[
+                        { label: 'Nenhuma (Canto)', value: '' },
+                        ...Object.keys(config?.instrumentos || {}).map((cat) => ({
+                          label: cat,
+                          value: cat,
+                        })),
+                      ]}
+                    />
                   </View>
 
                   {categoria && (
                     <View style={styles.fieldGroup}>
                       <Text style={styles.label}>Instrumento</Text>
-                      <View style={styles.pickerContainer}>
-                        <Picker
-                          selectedValue={instrumento}
-                          onValueChange={setInstrumento}
-                          style={styles.picker}
-                          dropdownIconColor="#34C759"
-                        >
-                          <Picker.Item label="Selecione..." value="" />
-                          {instrumentosFiltrados.map((inst) => (
-                            <Picker.Item key={inst} label={inst} value={inst} />
-                          ))}
-                        </Picker>
-                      </View>
+                      <AppPicker
+                        selectedValue={instrumento}
+                        onValueChange={setInstrumento}
+                        options={[
+                          { label: 'Selecione...', value: '' },
+                          ...instrumentosFiltrados.map((inst) => ({ label: inst, value: inst })),
+                        ]}
+                      />
                     </View>
                   )}
                 </>
@@ -279,19 +266,14 @@ export default function LaunchScreen() {
               {isIrmaos && (
                 <View style={styles.fieldGroup}>
                   <Text style={styles.label}>Ministério</Text>
-                  <View style={styles.pickerContainer}>
-                    <Picker
-                      selectedValue={ministerio}
-                      onValueChange={setMinisterio}
-                      style={styles.picker}
-                      dropdownIconColor="#34C759"
-                    >
-                      <Picker.Item label="Nenhum" value="" />
-                      {(config?.ministerios || []).map((m) => (
-                        <Picker.Item key={m} label={m} value={m} />
-                      ))}
-                    </Picker>
-                  </View>
+                  <AppPicker
+                    selectedValue={ministerio}
+                    onValueChange={setMinisterio}
+                    options={[
+                      { label: 'Nenhum', value: '' },
+                      ...(config?.ministerios || []).map((m) => ({ label: m, value: m })),
+                    ]}
+                  />
                 </View>
               )}
 
@@ -300,22 +282,20 @@ export default function LaunchScreen() {
                 <Text style={styles.label}>
                   {isIrmaos ? 'Música / Cargo' : 'Cargo Musical'}
                 </Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={musicaCargo}
-                    onValueChange={setMusicaCargo}
-                    style={styles.picker}
-                    dropdownIconColor="#34C759"
-                  >
-                    <Picker.Item 
-                      label={isIrmaos ? "Nenhum (Cantor)" : "Nenhum (Cantora)"} 
-                      value="" 
-                    />
-                    {(config?.cargosMusicais || []).map((cargo) => (
-                      <Picker.Item key={cargo} label={cargo} value={cargo} />
-                    ))}
-                  </Picker>
-                </View>
+                <AppPicker
+                  selectedValue={musicaCargo}
+                  onValueChange={setMusicaCargo}
+                  options={[
+                    {
+                      label: isIrmaos ? 'Nenhum (Cantor)' : 'Nenhum (Cantora)',
+                      value: '',
+                    },
+                    ...(config?.cargosMusicais || []).map((cargo) => ({
+                      label: cargo,
+                      value: cargo,
+                    })),
+                  ]}
+                />
               </View>
 
               {/* Botão Principal */}
@@ -572,17 +552,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-  },
-  pickerContainer: {
-    backgroundColor: '#0F1115',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(52, 199, 89, 0.2)',
-    overflow: 'hidden',
-  },
-  picker: {
-    color: '#FFFFFF',
-    height: 50,
   },
   textInput: {
     backgroundColor: '#0F1115',
