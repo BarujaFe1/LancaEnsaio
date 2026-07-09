@@ -2,7 +2,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -22,6 +21,7 @@ import {
   type Comprovante,
 } from '../../src/backend';
 import { getPrefs, savePrefs, type UserPrefs } from '../../src/session';
+import { notify } from '../../src/utils/notify';
 
 export default function LaunchScreen() {
   const [config, setConfig] = useState<ConfigData | null>(null);
@@ -53,7 +53,7 @@ export default function LaunchScreen() {
       setConfig(cfg);
     } catch (err) {
       console.error(err);
-      Alert.alert('Erro', 'Não foi possível carregar as configurações.');
+      notify('Erro', 'Não foi possível carregar as configurações.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -76,7 +76,7 @@ export default function LaunchScreen() {
 
   const handleLancar = async () => {
     if (!cidade) {
-      Alert.alert('Atenção', 'Selecione a cidade.');
+      notify('Atenção', 'Selecione a cidade.');
       return;
     }
 
@@ -95,17 +95,18 @@ export default function LaunchScreen() {
       const { idGerado: id, comprovante } = await enviarRegistro(payload);
       setUltimoId(id);
       setUltimoComprovante(comprovante);
-      
-      Alert.alert('✓ Lançamento Registrado', `ID: ${id}`, [{ text: 'OK' }]);
-      
+
+      notify('✓ Lançamento Registrado', `ID: ${id}`);
+
       // Limpar campos secundários mas manter cidade por conveniência
       setCategoria('');
       setInstrumento('');
       setMinisterio('');
       setMusicaCargo('');
-    } catch (err: any) {
-      const msg = err?.response?.data?.erro || err?.message || 'Falha ao enviar registro.';
-      Alert.alert('Erro', msg);
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { erro?: string } }; message?: string };
+      const msg = axiosErr?.response?.data?.erro || axiosErr?.message || 'Falha ao enviar registro.';
+      notify('Erro', msg);
     } finally {
       setEnviando(false);
     }
@@ -113,12 +114,12 @@ export default function LaunchScreen() {
 
   const handleAlertar = async () => {
     if (!ultimoId) {
-      Alert.alert('Atenção', 'Nenhum lançamento recente para alertar.');
+      notify('Atenção', 'Nenhum lançamento recente para alertar.');
       return;
     }
 
     if (!textoAlerta.trim()) {
-      Alert.alert('Atenção', 'Digite o texto do alerta.');
+      notify('Atenção', 'Digite o texto do alerta.');
       return;
     }
 
@@ -130,12 +131,13 @@ export default function LaunchScreen() {
         nomeLancador: prefs.nomeLancador,
       });
 
-      Alert.alert('✓ Alerta Adicionado', `Registro ${ultimoId} atualizado.`);
+      notify('✓ Alerta Adicionado', `Registro ${ultimoId} atualizado.`);
       setTextoAlerta('');
       setModoAlerta(false);
-    } catch (err: any) {
-      const msg = err?.response?.data?.erro || err?.message || 'Falha ao enviar alerta.';
-      Alert.alert('Erro', msg);
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { erro?: string } }; message?: string };
+      const msg = axiosErr?.response?.data?.erro || axiosErr?.message || 'Falha ao enviar alerta.';
+      notify('Erro', msg);
     } finally {
       setEnviando(false);
     }

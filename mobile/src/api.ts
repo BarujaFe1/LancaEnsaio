@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const BASE_URL = (process.env.EXPO_PUBLIC_API_URL || '').trim();
 
-if (!BASE_URL) {
+if (!BASE_URL && typeof __DEV__ !== 'undefined' && __DEV__) {
   console.warn(
     '⚠️ EXPO_PUBLIC_API_URL não definido. Crie mobile/.env (Expo Go) e configure no EAS (APK).'
   );

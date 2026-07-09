@@ -7,9 +7,17 @@ const BADGES = ['React Native', 'Expo', 'Supabase', 'TypeScript'];
 const PORTFOLIO_URL = 'https://barujafe.vercel.app';
 const REPO_URL = 'https://github.com/BarujaFe1/LancaEnsaio';
 
+function openExternal(href: string) {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    window.open(href, '_blank', 'noopener,noreferrer');
+    return;
+  }
+  Linking.openURL(href);
+}
+
 function ExtLink({ href, label }: { href: string; label: string }) {
   return (
-    <TouchableOpacity onPress={() => Linking.openURL(href)}>
+    <TouchableOpacity onPress={() => openExternal(href)} accessibilityRole="link">
       <Text style={styles.link}>{label}</Text>
     </TouchableOpacity>
   );
@@ -44,6 +52,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
     backgroundColor: '#0F1115',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.08)',
@@ -86,6 +95,7 @@ const styles = StyleSheet.create({
   },
   links: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 16,
   },
   link: {

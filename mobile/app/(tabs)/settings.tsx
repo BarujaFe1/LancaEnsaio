@@ -6,13 +6,13 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Alert,
   ScrollView,
   Platform,
 } from 'react-native';
 import { getPrefs, savePrefs, clearPrefs, UserPrefs } from '../../src/session';
 import { api } from '../../src/api';
 import { isDemo } from '../../src/backend';
+import { notify } from '../../src/utils/notify';
 
 export default function SettingsScreen() {
   const [prefs, setPrefs] = useState<UserPrefs>({ nomeLancador: '', tipoSelecionado: null });
@@ -29,11 +29,11 @@ export default function SettingsScreen() {
   const handleSalvarNome = async () => {
     const nomeLimpo = nome.trim();
     if (!nomeLimpo) {
-      Alert.alert('Erro', 'O nome não pode ser vazio.');
+      notify('Erro', 'O nome não pode ser vazio.');
       return;
     }
     await savePrefs({ nomeLancador: nomeLimpo });
-    Alert.alert('Sucesso', 'Nome atualizado com sucesso.');
+    notify('Sucesso', 'Nome atualizado com sucesso.');
   };
 
   const handleTrocarTipo = async (novoTipo: 'IRMAOS' | 'IRMAS') => {
@@ -42,12 +42,12 @@ export default function SettingsScreen() {
   };
 
   const handleLimparPrefs = () => {
-    Alert.alert(
+    notify(
       'Limpar tudo',
       'Tem certeza que deseja limpar todas as preferências e voltar ao setup?',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { text: 'Sim, limpar', style: 'destructive', onPress: async () => await clearPrefs() }
+        { text: 'Sim, limpar', style: 'destructive', onPress: async () => await clearPrefs() },
       ]
     );
   };
