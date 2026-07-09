@@ -120,6 +120,12 @@ O LançaEnsaio também está disponível como **site web estático** (Expo Web) 
 - Build estático na Vercel com `expo export --platform web` e SPA rewrite.
 - Nenhum backend real necessário — ideal para recrutadores e avaliadores.
 
+**Limitações conhecidas da Web Demo**
+- Bundle único (~1.6 MB) gerado por `expo export --platform web` (sem code-splitting de rotas).
+- Pickers usam `<select>` HTML no web; o tema dark é forçado via CSS, mas o dropdown nativo do SO ainda pode variar entre navegadores.
+- `Alert` nativo do React Native é substituído por `window.alert`/`confirm` no web.
+- Preferências e log demo ficam em `localStorage` (podem ser limpos pelo usuário).
+
 ```txt
 portfolio-project-handoff.md  →  Documentação completa de handoff do deploy web
 ```
@@ -243,6 +249,12 @@ LançaEnsaio is also available as a **static web site** (Expo Web) for immediate
 - Professional header with badges (React Native, Expo, Supabase, TypeScript) and portfolio/GitHub links.
 - Static build on Vercel with `expo export --platform web` and SPA rewrite.
 - No real backend needed — ideal for recruiters and evaluators.
+
+**Known Web Demo limitations**
+- Single JS bundle (~1.6 MB) from `expo export --platform web` (no route-level code splitting).
+- Pickers render as HTML `<select>` on web; dark theme is forced via CSS, but the OS dropdown may still vary by browser.
+- React Native `Alert` is replaced by `window.alert`/`confirm` on web.
+- Preferences and demo log live in `localStorage` (can be cleared by the user).
 
 ```txt
 portfolio-project-handoff.md  →  Complete handoff documentation for the web deploy

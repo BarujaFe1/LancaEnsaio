@@ -53,3 +53,4 @@ _scan_output/
 package-lock.json
 yarn.lock
 .vercel
+.env*

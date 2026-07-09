@@ -12,7 +12,6 @@ import {
   View,
   RefreshControl,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import {
   getConfig,
   enviarRegistro,
@@ -20,6 +19,7 @@ import {
   type ConfigData,
   type Comprovante,
 } from '../../src/backend';
+import { AppPicker } from '../../src/components/AppPicker';
 import { getPrefs, savePrefs, type UserPrefs } from '../../src/session';
 import { notify } from '../../src/utils/notify';
 
@@ -215,19 +215,14 @@ export default function LaunchScreen() {
               {/* Cidade */}
               <View style={styles.fieldGroup}>
                 <Text style={styles.label}>Cidade *</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={cidade}
-                    onValueChange={setCidade}
-                    style={styles.picker}
-                    dropdownIconColor="#34C759"
-                  >
-                    <Picker.Item label="Selecione a cidade..." value="" />
-                    {(config?.cidades || []).map((c) => (
-                      <Picker.Item key={c} label={c} value={c} />
-                    ))}
-                  </Picker>
-                </View>
+                <AppPicker
+                  selectedValue={cidade}
+                  onValueChange={setCidade}
+                  options={[
+                    { label: 'Selecione a cidade...', value: '' },
+                    ...(config?.cidades || []).map((c) => ({ label: c, value: c })),
+                  ]}
+                />
               </View>
 
               {/* Campos específicos para IRMÃOS */}
@@ -235,40 +230,33 @@ export default function LaunchScreen() {
                 <>
                   <View style={styles.fieldGroup}>
                     <Text style={styles.label}>Categoria</Text>
-                    <View style={styles.pickerContainer}>
-                      <Picker
-                        selectedValue={categoria}
-                        onValueChange={(val) => {
-                          setCategoria(val);
-                          setInstrumento('');
-                        }}
-                        style={styles.picker}
-                        dropdownIconColor="#34C759"
-                      >
-                        <Picker.Item label="Nenhuma (Canto)" value="" />
-                        {Object.keys(config?.instrumentos || {}).map((cat) => (
-                          <Picker.Item key={cat} label={cat} value={cat} />
-                        ))}
-                      </Picker>
-                    </View>
+                    <AppPicker
+                      selectedValue={categoria}
+                      onValueChange={(val) => {
+                        setCategoria(val);
+                        setInstrumento('');
+                      }}
+                      options={[
+                        { label: 'Nenhuma (Canto)', value: '' },
+                        ...Object.keys(config?.instrumentos || {}).map((cat) => ({
+                          label: cat,
+                          value: cat,
+                        })),
+                      ]}
+                    />
                   </View>
 
                   {categoria && (
                     <View style={styles.fieldGroup}>
                       <Text style={styles.label}>Instrumento</Text>
-                      <View style={styles.pickerContainer}>
-                        <Picker
-                          selectedValue={instrumento}
-                          onValueChange={setInstrumento}
-                          style={styles.picker}
-                          dropdownIconColor="#34C759"
-                        >
-                          <Picker.Item label="Selecione..." value="" />
-                          {instrumentosFiltrados.map((inst) => (
-                            <Picker.Item key={inst} label={inst} value={inst} />
-                          ))}
-                        </Picker>
-                      </View>
+                      <AppPicker
+                        selectedValue={instrumento}
+                        onValueChange={setInstrumento}
+                        options={[
+                          { label: 'Selecione...', value: '' },
+                          ...instrumentosFiltrados.map((inst) => ({ label: inst, value: inst })),
+                        ]}
+                      />
                     </View>
                   )}
                 </>
@@ -278,19 +266,14 @@ export default function LaunchScreen() {
               {isIrmaos && (
                 <View style={styles.fieldGroup}>
                   <Text style={styles.label}>Ministério</Text>
-                  <View style={styles.pickerContainer}>
-                    <Picker
-                      selectedValue={ministerio}
-                      onValueChange={setMinisterio}
-                      style={styles.picker}
-                      dropdownIconColor="#34C759"
-                    >
-                      <Picker.Item label="Nenhum" value="" />
-                      {(config?.ministerios || []).map((m) => (
-                        <Picker.Item key={m} label={m} value={m} />
-                      ))}
-                    </Picker>
-                  </View>
+                  <AppPicker
+                    selectedValue={ministerio}
+                    onValueChange={setMinisterio}
+                    options={[
+                      { label: 'Nenhum', value: '' },
+                      ...(config?.ministerios || []).map((m) => ({ label: m, value: m })),
+                    ]}
+                  />
                 </View>
               )}
 
@@ -299,22 +282,20 @@ export default function LaunchScreen() {
                 <Text style={styles.label}>
                   {isIrmaos ? 'Música / Cargo' : 'Cargo Musical'}
                 </Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={musicaCargo}
-                    onValueChange={setMusicaCargo}
-                    style={styles.picker}
-                    dropdownIconColor="#34C759"
-                  >
-                    <Picker.Item 
-                      label={isIrmaos ? "Nenhum (Cantor)" : "Nenhum (Cantora)"} 
-                      value="" 
-                    />
-                    {(config?.cargosMusicais || []).map((cargo) => (
-                      <Picker.Item key={cargo} label={cargo} value={cargo} />
-                    ))}
-                  </Picker>
-                </View>
+                <AppPicker
+                  selectedValue={musicaCargo}
+                  onValueChange={setMusicaCargo}
+                  options={[
+                    {
+                      label: isIrmaos ? 'Nenhum (Cantor)' : 'Nenhum (Cantora)',
+                      value: '',
+                    },
+                    ...(config?.cargosMusicais || []).map((cargo) => ({
+                      label: cargo,
+                      value: cargo,
+                    })),
+                  ]}
+                />
               </View>
 
               {/* Botão Principal */}
@@ -571,17 +552,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-  },
-  pickerContainer: {
-    backgroundColor: '#0F1115',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(52, 199, 89, 0.2)',
-    overflow: 'hidden',
-  },
-  picker: {
-    color: '#FFFFFF',
-    height: 50,
   },
   textInput: {
     backgroundColor: '#0F1115',
