@@ -14,21 +14,20 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { getConfig, enviarRegistro, enviarAlerta } from '../../src/backend';
-import { getPrefs, savePrefs } from '../../src/session';
-
-type ConfigData = {
-  instrumentos: Record<string, string[]>;
-  cidades: string[];
-  ministerios: string[];
-  cargosMusicais: string[];
-};
+import {
+  getConfig,
+  enviarRegistro,
+  enviarAlerta,
+  type ConfigData,
+  type Comprovante,
+} from '../../src/backend';
+import { getPrefs, savePrefs, type UserPrefs } from '../../src/session';
 
 export default function LaunchScreen() {
   const [config, setConfig] = useState<ConfigData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [prefs, setPrefs] = useState<{ nomeLancador: string; tipoSelecionado: string | null }>({
+  const [prefs, setPrefs] = useState<UserPrefs>({
     nomeLancador: '',
     tipoSelecionado: null,
   });
@@ -41,7 +40,7 @@ export default function LaunchScreen() {
   const [musicaCargo, setMusicaCargo] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [ultimoId, setUltimoId] = useState<string | null>(null);
-  const [ultimoComprovante, setUltimoComprovante] = useState<any>(null);
+  const [ultimoComprovante, setUltimoComprovante] = useState<Comprovante | null>(null);
   const [modoAlerta, setModoAlerta] = useState(false);
   const [textoAlerta, setTextoAlerta] = useState('');
 

@@ -27,6 +27,22 @@ export type RegistroPayload = {
   musicaCargo: string;
 };
 
+export type Comprovante = {
+  id: string;
+  horario: string;
+  cidade: string;
+  instrumento: string;
+  ministerio: string;
+  musica: string;
+  auditoria: string;
+  alerta?: string;
+};
+
+type DemoLogEntry = Comprovante & {
+  tipo: RegistroPayload['tipo'];
+  categoria: string;
+};
+
 const DEMO_INSTRUMENTOS: Record<string, string[]> = {
   Cordas: ['Violão', 'Viola', 'Cavaquinho', 'Baixo Acústico', 'Baixo Elétrico'],
   Sopros: ['Flauta', 'Saxofone', 'Trompete', 'Clarinete', 'Sax Barítono'],
@@ -64,10 +80,10 @@ function gerarId(): string {
 
 export async function enviarRegistro(
   payload: RegistroPayload
-): Promise<{ idGerado: string; comprovante: any }> {
+): Promise<{ idGerado: string; comprovante: Comprovante | null }> {
   if (isDemo()) {
     const id = gerarId();
-    const comprovante = {
+    const comprovante: Comprovante = {
       id,
       horario: formatDeviceTimestamp(),
       cidade: payload.cidade,
@@ -80,7 +96,7 @@ export async function enviarRegistro(
     // Grava localmente (modo demonstração)
     try {
       const raw = await AsyncStorage.getItem(DEMO_LOG_KEY);
-      const log = raw ? JSON.parse(raw) : [];
+      const log: DemoLogEntry[] = raw ? JSON.parse(raw) : [];
       log.unshift({ ...comprovante, tipo: payload.tipo, categoria: payload.categoria });
       await AsyncStorage.setItem(DEMO_LOG_KEY, JSON.stringify(log.slice(0, 50)));
     } catch {
@@ -102,8 +118,8 @@ export async function enviarAlerta(params: {
   if (isDemo()) {
     try {
       const raw = await AsyncStorage.getItem(DEMO_LOG_KEY);
-      const log = raw ? JSON.parse(raw) : [];
-      const idx = log.findIndex((r: any) => r.id === params.id);
+      const log: DemoLogEntry[] = raw ? JSON.parse(raw) : [];
+      const idx = log.findIndex((r) => r.id === params.id);
       if (idx >= 0) {
         log[idx].alerta = params.aviso;
         await AsyncStorage.setItem(DEMO_LOG_KEY, JSON.stringify(log));

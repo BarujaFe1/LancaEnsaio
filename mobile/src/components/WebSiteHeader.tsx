@@ -4,7 +4,7 @@ import { Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'rea
 
 const BADGES = ['React Native', 'Expo', 'Supabase', 'TypeScript'];
 
-const PORTFOLIO_URL = 'https://github.com/BarujaFe1';
+const PORTFOLIO_URL = 'https://barujafe.vercel.app';
 const REPO_URL = 'https://github.com/BarujaFe1/LancaEnsaio';
 
 function ExtLink({ href, label }: { href: string; label: string }) {

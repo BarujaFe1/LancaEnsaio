@@ -93,7 +93,9 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>Infraestrutura</Text>
           <Text style={styles.label}>Endpoint da API</Text>
           <View style={styles.infoBox}>
-            {isDemo() ? 'Modo Demo (sem backend) — dados simulados' : api.defaults.baseURL}
+            <Text style={styles.infoText}>
+              {isDemo() ? 'Modo Demo (sem backend) — dados simulados' : api.defaults.baseURL}
+            </Text>
           </View>
         </View>
 
