@@ -7,7 +7,7 @@
 - `GOOGLE_SERVICE_ACCOUNT_B64` = (configurado)
 
 ✅ Arquivo `.env` criado em `mobile/.env`:
-- `EXPO_PUBLIC_API_URL=https://jzkozhnuyewnjwfgjhaa.supabase.co/functions/v1/api`
+- `EXPO_PUBLIC_API_URL=https://SEU_PROJECT_REF.supabase.co/functions/v1/api`
 
 ✅ Planilha compartilhada com: `backend-orquestra@app-orquestra.iam.gserviceaccount.com`
 
@@ -17,7 +17,7 @@ A função Edge precisa ser deployada. Você tem 2 opções:
 
 ### Opção 1: Via Dashboard (Mais Fácil)
 
-1. Acesse: https://supabase.com/dashboard/project/jzkozhnuyewnjwfgjhaa/functions
+1. Acesse: https://supabase.com/dashboard/project/SEU_PROJECT_REF/functions
 2. Clique na função "api"
 3. Clique em "Deploy new version"
 4. Faça upload do arquivo: `C:\dev\LancaEnsaio\supabase\functions\api\index.ts`
@@ -41,7 +41,7 @@ Depois faça login e deploy:
 ```powershell
 cd C:\dev\LancaEnsaio
 supabase login
-supabase link --project-ref jzkozhnuyewnjwfgjhaa
+supabase link --project-ref SEU_PROJECT_REF
 supabase functions deploy api --no-verify-jwt
 ```
 

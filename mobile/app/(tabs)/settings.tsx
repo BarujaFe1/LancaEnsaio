@@ -103,7 +103,7 @@ export default function SettingsScreen() {
           <Text style={styles.dangerButtonText}>Limpar Preferências Locais</Text>
         </TouchableOpacity>
 
-        <Text style={styles.footer}>LançaEnsaio Unificado v2.0</Text>
+        <Text style={styles.footer}>LançaEnsaio Unificado v2.1 · qualidade / auditoria testada</Text>
       </View>
     </ScrollView>
   );

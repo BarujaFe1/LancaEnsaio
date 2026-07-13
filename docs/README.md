@@ -1,22 +1,13 @@
-# Documentação Técnica
+# docs/
 
-Esta pasta contém documentação técnica detalhada do projeto LançaEnsaio.
+Documentação operacional e de portfólio do LançaEnsaio.
 
-## 📋 Arquivos
-
-### Evidências e Baseline
-- **BASELINE_CONFIRMADA.md** - Evidências técnicas da investigação inicial
-- **RELATORIO_FINAL_EXECUCAO.md** - Relatório completo de execução
-
-### Correções e Melhorias
-- **RESUMO_CORRECOES_V2.md** - Histórico de correções da v2.0
-- **CORRECAO_ERRO_DUPLICADO.md** - Correção do erro de telas duplicadas
-
-### Testes
-- **ROTEIRO_TESTE_MANUAL.md** - Roteiro completo de teste manual
-
-## 🔗 Links Úteis
-
-- [Voltar ao README principal](../README.md)
-- [Guia de início rápido](../COMECE_AQUI.md)
-- [Como gerar APK](../COMO_GERAR_APK.md)
+| Arquivo | Conteúdo |
+|---------|----------|
+| [AUDIT_REPORT.md](./AUDIT_REPORT.md) | Diagnóstico e plano do quality pass |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Arquitetura do sistema |
+| [TECHNICAL_DECISIONS.md](./TECHNICAL_DECISIONS.md) | Decisões e trade-offs |
+| [TESTING.md](./TESTING.md) | Estratégia de testes |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | Deploy API / APK / Vercel |
+| [HANDOFF.md](./HANDOFF.md) | Entrega desta revisão |
+| [ROTEIRO_TESTE_MANUAL.md](./ROTEIRO_TESTE_MANUAL.md) | Roteiro manual de campo |

@@ -91,8 +91,8 @@ Ver **COMO_GERAR_APK.md** para instruções completas.
 - ✅ Working tree clean
 
 ### Backend
-- ✅ Deployado em `jzkozhnuyewnjwfgjhaa`
-- ✅ URL: `https://jzkozhnuyewnjwfgjhaa.supabase.co/functions/v1/api`
+- ✅ Deployado em `SEU_PROJECT_REF`
+- ✅ URL: `https://SEU_PROJECT_REF.supabase.co/functions/v1/api` (ver `mobile/.env` / EAS secrets)
 - ✅ Endpoints testados e funcionais
 
 ---

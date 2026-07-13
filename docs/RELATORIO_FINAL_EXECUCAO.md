@@ -118,7 +118,7 @@ O projeto foi **INVESTIGADO, UNIFICADO, VALIDADO e VERSIONADO** com sucesso. A c
 
 ### Backend
 - **Status**: ✅ FUNCIONAL e VALIDADO
-- **Deploy**: ✅ Ativo em `jzkozhnuyewnjwfgjhaa`
+- **Deploy**: ✅ Ativo em `SEU_PROJECT_REF`
 - **Endpoints**: ✅ Todos testados e funcionando
 - **Integração Sheets**: ✅ Lendo config e gravando registros
 
@@ -165,8 +165,8 @@ Exemplos reais:
 - Commits: 2 novos (unificação + docs)
 
 ### Qual projeto Supabase ficou como canônico?
-**`jzkozhnuyewnjwfgjhaa` (LançaEnsaio)**
-- URL: `https://jzkozhnuyewnjwfgjhaa.supabase.co`
+**`SEU_PROJECT_REF` (LançaEnsaio)**
+- URL: `https://SEU_PROJECT_REF.supabase.co`
 - Região: East US (Ohio)
 - Status: Ativo e funcional
 
@@ -207,7 +207,7 @@ Exemplos reais:
 **`D:\Dev\Projetos VibeCoding\LancaEnsaioIrmaos`** (Git: `https://github.com/BarujaFe1/LancaEnsaio.git`)
 
 ### Projeto Supabase canônico final
-**`jzkozhnuyewnjwfgjhaa` (LançaEnsaio)** - `https://jzkozhnuyewnjwfgjhaa.supabase.co`
+**`SEU_PROJECT_REF` (LançaEnsaio)** - `https://SEU_PROJECT_REF.supabase.co`
 
 ### Lock de concorrência
 **REMOVIDO** - Append simples na planilha
@@ -232,7 +232,7 @@ Exemplos reais:
 
 ### Rotacionar Service Role Key (CRÍTICO)
 ```
-1. Acessar: https://supabase.com/dashboard/project/jzkozhnuyewnjwfgjhaa/settings/api
+1. Acessar: https://supabase.com/dashboard/project/SEU_PROJECT_REF/settings/api
 2. Clicar em "Roll" na seção Service Role Key
 3. Confirmar rotação
 ```

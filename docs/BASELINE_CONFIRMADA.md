@@ -1,7 +1,7 @@
 # Baseline Confirmada - LançaEnsaio Unificado
 
 **Data da Auditoria**: 2026-04-24  
-**Projeto Supabase**: jzkozhnuyewnjwfgjhaa (LançaEnsaio)  
+**Projeto Supabase**: SEU_PROJECT_REF (LançaEnsaio)  
 **Repositório**: https://github.com/BarujaFe1/LancaEnsaio.git  
 **Diretório**: D:\Dev\Projetos VibeCoding\LancaEnsaioIrmaos
 

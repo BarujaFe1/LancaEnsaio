@@ -2,6 +2,8 @@
 // Edge Function "api" UNIFICADA (Irmãos e Irmãs)
 // Sem autenticação complexa, identifica o lançador explicitamente.
 
+import { auditarRegistro, gerarIdRegistro } from "./auditoria.ts";
+
 type RegistroPayload = {
   nomeLancador?: string;
   tipo?: "IRMAOS" | "IRMAS";
@@ -30,15 +32,11 @@ function json(data: unknown, status = 200) {
   });
 }
 
-function stripAccents(str: string) {
-  return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-}
-
 function limparArray(arr: string[] = []) {
   return Array.from(new Set(arr.map((v) => (v ?? "").toString().trim()).filter((v) => v && v !== "-")));
 }
 
-function safeString(v: any) {
+function safeString(v: unknown) {
   if (typeof v === "string" && v.trim()) return v.trim();
   return "-";
 }
@@ -46,66 +44,6 @@ function safeString(v: any) {
 function formatNowBR() {
   const d = new Date();
   return d.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
-}
-
-function buildMaleUserPrefix(nome: string) {
-  const palavras = stripAccents(nome || "")
-    .toUpperCase()
-    .replace(/[^A-Z\s]/g, " ")
-    .split(/\s+/)
-    .filter(Boolean);
-
-  const partes = palavras.map((p) => p.slice(0, 3)).join("");
-  return `M${partes || "USR"}`;
-}
-
-function random4() {
-  return Math.floor(Math.random() * 9000 + 1000).toString();
-}
-
-function gerarIdRegistro(tipo: "IRMAOS" | "IRMAS", nomeUsuario: string) {
-  if (tipo === "IRMAS") return `F${random4()}`;
-  const prefixo = buildMaleUserPrefix(nomeUsuario || "Anonimo");
-  return `${prefixo}${random4()}`;
-}
-
-function auditarRegistro(dados: any) {
-  const cat = dados.categoria && dados.categoria !== "-" ? dados.categoria : "";
-  const inst = dados.instrumento && dados.instrumento !== "-" ? dados.instrumento : "";
-  const min = dados.ministerio && dados.ministerio !== "-" ? dados.ministerio : "";
-  const mus = dados.musicaCargo && dados.musicaCargo !== "-" ? dados.musicaCargo : "";
-  const cid = dados.cidade && dados.cidade !== "-" ? dados.cidade : "";
-
-  // IRMÃS - sem ministério, apenas música/cargo (Organista, Instrutora, Examinadora)
-  if (dados.tipo === "IRMAS") {
-    if (!cid) return { cargoFinal: "-", statusAuditoria: "ERRO 01: 🏙️ Falta Cidade" };
-    // Se não selecionou cargo, é Cantora
-    if (!mus) return { cargoFinal: "Cantora", statusAuditoria: "" };
-    return { cargoFinal: mus, statusAuditoria: "" };
-  }
-
-  // IRMÃOS
-  const isVazio = !cat && !inst && !min && !mus;
-
-  // Se não selecionou nada (sem instrumento e sem cargo), é Cantor
-  if (isVazio) {
-    if (cid) return { cargoFinal: "Cantor", statusAuditoria: "" };
-    return { cargoFinal: "-", statusAuditoria: "ERRO 01: 🏙️ Falta Cidade" };
-  }
-
-  if (!cid) return { cargoFinal: mus || "-", statusAuditoria: "ERRO 01: 🏙️ Falta Cidade" };
-  if (inst && !cat) return { cargoFinal: mus || "-", statusAuditoria: "ERRO 02: 🎻 Instr sem Cat" };
-  if (cat && !inst && !mus) return { cargoFinal: mus || "-", statusAuditoria: "ERRO 03: 📂 Cat sem Instr" };
-  if (mus && !inst && mus !== "Cantor") return { cargoFinal: mus || "-", statusAuditoria: "ERRO 04: 🎼 Cargo sem Instr" };
-  if (mus && min) return { cargoFinal: mus || "-", statusAuditoria: "ERRO 05: 👔 Conflito Cargos" };
-
-  const erros: string[] = [];
-  if (min && inst) erros.push("ERRO 11: 👔 Min Tocando");
-
-  return {
-    cargoFinal: mus || "-",
-    statusAuditoria: erros.length ? erros.join(" | ") : "",
-  };
 }
 
 function b64urlEncodeBytes(bytes: Uint8Array) {
@@ -247,8 +185,6 @@ async function sheetsUpdate(range: string, values: any[][]) {
 
 Deno.serve(async (req: Request) => {
   try {
-    mustEnv();
-
     if (req.method === "OPTIONS") {
       return json({ ok: true }, 200);
     }
@@ -272,10 +208,17 @@ Deno.serve(async (req: Request) => {
 
     if (path === "" || path === "/") path = "/";
 
-    // GET /health
+    // GET /health — não depende de secrets (monitoramento / CI)
     if (req.method === "GET" && (path === "/" || path === "/health")) {
-      return json({ ok: true, service: "LançaEnsaio API Unificada", now: new Date().toISOString() });
+      return json({
+        ok: true,
+        service: "LançaEnsaio API Unificada",
+        now: new Date().toISOString(),
+        sheetsConfigured: Boolean(ORQUESTRA_SHEET_ID && GOOGLE_SERVICE_ACCOUNT_B64),
+      });
     }
+
+    mustEnv();
 
     // GET /config
     if (req.method === "GET" && path === "/config") {

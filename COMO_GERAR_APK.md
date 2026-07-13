@@ -103,7 +103,7 @@ cd android
 Antes de gerar o APK, certifique-se de que o `.env` está correto:
 
 ```env
-EXPO_PUBLIC_API_URL=https://jzkozhnuyewnjwfgjhaa.supabase.co/functions/v1/api
+EXPO_PUBLIC_API_URL=https://SEU_PROJECT_REF.supabase.co/functions/v1/api
 ```
 
 ## Versão e Build Number

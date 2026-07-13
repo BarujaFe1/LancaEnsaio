@@ -2,7 +2,7 @@
 
 **Data**: 2026-04-24  
 **Versão**: 2.0 (com alerta unificado)  
-**URL da API**: https://jzkozhnuyewnjwfgjhaa.supabase.co/functions/v1/api
+**URL da API**: https://SEU_PROJECT_REF.supabase.co/functions/v1/api (configurar em `mobile/.env`)
 
 ---
 

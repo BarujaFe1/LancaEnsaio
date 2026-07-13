@@ -1,8 +1,8 @@
 # ROTEIRO DE TESTE MANUAL - LançaEnsaio
 
 **Data**: 2026-04-24  
-**Projeto Supabase**: jzkozhnuyewnjwfgjhaa (LançaEnsaio)  
-**URL da API**: https://jzkozhnuyewnjwfgjhaa.supabase.co/functions/v1/api  
+**Projeto Supabase**: SEU_PROJECT_REF (LançaEnsaio)  
+**URL da API**: https://SEU_PROJECT_REF.supabase.co/functions/v1/api (configurar em `mobile/.env`)  
 **Diretório**: D:\Dev\Projetos VibeCoding\LancaEnsaioIrmaos
 
 ---
@@ -241,7 +241,7 @@ npx expo start
 
 ### URL da API
 ```
-https://jzkozhnuyewnjwfgjhaa.supabase.co/functions/v1/api
+https://SEU_PROJECT_REF.supabase.co/functions/v1/api
 ```
 
 ### Planilha Google Sheets
