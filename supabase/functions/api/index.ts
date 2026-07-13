@@ -1,8 +1,14 @@
 // supabase/functions/api/index.ts
 // Edge Function "api" UNIFICADA (Irmãos e Irmãs)
-// Sem autenticação complexa, identifica o lançador explicitamente.
+// Auth: APP_API_TOKEN (Bearer / x-app-token). Health público.
 
 import { auditarRegistro, gerarIdRegistro } from "./auditoria.ts";
+import { authorizeRequest } from "./auth.ts";
+import {
+  appendIdemToMetadado,
+  findRowByIdempotencyKey,
+  normalizeIdempotencyKey,
+} from "./idempotency.ts";
 
 type RegistroPayload = {
   nomeLancador?: string;
@@ -12,13 +18,16 @@ type RegistroPayload = {
   instrumento?: string;
   ministerio?: string;
   musicaCargo?: string;
+  idempotencyKey?: string;
 };
 
 const ORQUESTRA_SHEET_ID = Deno.env.get("ORQUESTRA_SHEET_ID") || "";
 const GOOGLE_SERVICE_ACCOUNT_B64 = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_B64") || "";
+const APP_API_TOKEN = Deno.env.get("APP_API_TOKEN") || "";
 
 const SHEET_CONFIG_RANGE = "'Base Geral'!A2:H500";
 const SHEET_REGISTROS_RANGE = "'Dados Geral'!A:H";
+const SHEET_REGISTROS_TABLE = "'Dados Geral'!A2:H5000";
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -26,14 +35,17 @@ function json(data: unknown, status = 200) {
     headers: {
       "content-type": "application/json; charset=utf-8",
       "access-control-allow-origin": "*",
-      "access-control-allow-headers": "authorization, content-type",
+      "access-control-allow-headers":
+        "authorization, content-type, x-app-token, idempotency-key",
       "access-control-allow-methods": "GET,POST,OPTIONS",
     },
   });
 }
 
 function limparArray(arr: string[] = []) {
-  return Array.from(new Set(arr.map((v) => (v ?? "").toString().trim()).filter((v) => v && v !== "-")));
+  return Array.from(
+    new Set(arr.map((v) => (v ?? "").toString().trim()).filter((v) => v && v !== "-")),
+  );
 }
 
 function safeString(v: unknown) {
@@ -129,13 +141,14 @@ async function getGoogleAccessToken(): Promise<string> {
 
   const data = await resp.json();
   cachedGoogleToken = data.access_token;
-  cachedGoogleTokenExpMs = now + (Number(data.expires_in || 3600) * 1000);
+  cachedGoogleTokenExpMs = now + Number(data.expires_in || 3600) * 1000;
   return cachedGoogleToken;
 }
 
 async function sheetsGet(range: string) {
   const access = await getGoogleAccessToken();
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(ORQUESTRA_SHEET_ID)}/values/${encodeURIComponent(range)}`;
+  const url =
+    `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(ORQUESTRA_SHEET_ID)}/values/${encodeURIComponent(range)}`;
   const resp = await fetch(url, {
     headers: { authorization: `Bearer ${access}` },
   });
@@ -144,12 +157,13 @@ async function sheetsGet(range: string) {
     throw new Error(`Sheets GET falhou: ${resp.status} ${t}`);
   }
   const data = await resp.json();
-  return (data.values || []) as any[][];
+  return (data.values || []) as string[][];
 }
 
-async function sheetsAppend(range: string, values: any[][]) {
+async function sheetsAppend(range: string, values: string[][]) {
   const access = await getGoogleAccessToken();
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(ORQUESTRA_SHEET_ID)}/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+  const url =
+    `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(ORQUESTRA_SHEET_ID)}/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
   const resp = await fetch(url, {
     method: "POST",
     headers: {
@@ -165,9 +179,10 @@ async function sheetsAppend(range: string, values: any[][]) {
   return await resp.json();
 }
 
-async function sheetsUpdate(range: string, values: any[][]) {
+async function sheetsUpdate(range: string, values: string[][]) {
   const access = await getGoogleAccessToken();
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(ORQUESTRA_SHEET_ID)}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`;
+  const url =
+    `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(ORQUESTRA_SHEET_ID)}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`;
   const resp = await fetch(url, {
     method: "PUT",
     headers: {
@@ -183,39 +198,41 @@ async function sheetsUpdate(range: string, values: any[][]) {
   return await resp.json();
 }
 
+function resolvePath(pathname: string): string {
+  let path = pathname.replace(/\/+$/g, "");
+  if (path.includes("/functions/v1/api")) {
+    path = path.split("/functions/v1/api")[1] || "/";
+  } else if (path.includes("/functions/v1/")) {
+    const parts = path.split("/");
+    path = "/" + parts.slice(4).join("/");
+  }
+  if (path.startsWith("/api")) path = path.slice(4) || "/";
+  if (path === "" || path === "/") path = "/";
+  return path;
+}
+
 Deno.serve(async (req: Request) => {
   try {
     if (req.method === "OPTIONS") {
       return json({ ok: true }, 200);
     }
 
-    const url = new URL(req.url);
-    const pathname = url.pathname;
+    const path = resolvePath(new URL(req.url).pathname);
 
-    // Simplificação radical do roteamento para suportar múltiplos formatos de URL do Supabase
-    let path = pathname.replace(/\/+$/g, "");
-    if (path.includes("/functions/v1/api")) {
-      path = path.split("/functions/v1/api")[1] || "/";
-    } else if (path.includes("/functions/v1/")) {
-      const parts = path.split("/");
-      // Assume que a parte após /v1/ é o nome da function, e o que segue é o path da API
-      path = "/" + parts.slice(4).join("/");
-    }
-
-    if (path.startsWith("/api")) {
-      path = path.slice(4) || "/";
-    }
-
-    if (path === "" || path === "/") path = "/";
-
-    // GET /health — não depende de secrets (monitoramento / CI)
+    // GET /health — público
     if (req.method === "GET" && (path === "/" || path === "/health")) {
       return json({
         ok: true,
         service: "LançaEnsaio API Unificada",
         now: new Date().toISOString(),
         sheetsConfigured: Boolean(ORQUESTRA_SHEET_ID && GOOGLE_SERVICE_ACCOUNT_B64),
+        authEnforced: Boolean(APP_API_TOKEN.trim()),
       });
+    }
+
+    const auth = authorizeRequest(req, APP_API_TOKEN);
+    if (!auth.ok) {
+      return json({ erro: auth.erro }, auth.status);
     }
 
     mustEnv();
@@ -265,6 +282,31 @@ Deno.serve(async (req: Request) => {
       const tipo = (dados.tipo || "IRMAOS") as "IRMAOS" | "IRMAS";
       const nomeLancador = (dados.nomeLancador || "Desconhecido").trim();
 
+      const idemFromHeader = normalizeIdempotencyKey(req.headers.get("idempotency-key"));
+      const idemKey = normalizeIdempotencyKey(dados.idempotencyKey) || idemFromHeader;
+
+      if (idemKey) {
+        const existingRows = await sheetsGet(SHEET_REGISTROS_TABLE);
+        const hit = findRowByIdempotencyKey(existingRows, idemKey);
+        if (hit) {
+          return json({
+            sucesso: true,
+            idGerado: hit.id,
+            replayed: true,
+            statusAuditoria: hit.metadado,
+            comprovante: {
+              id: hit.id,
+              horario: hit.horario,
+              cidade: hit.cidade,
+              instrumento: hit.instrumento,
+              ministerio: hit.ministerio,
+              musica: hit.musica,
+              auditoria: hit.metadado,
+            },
+          });
+        }
+      }
+
       const idGerado = gerarIdRegistro(tipo, nomeLancador);
 
       const dadosParaAuditoria = {
@@ -279,9 +321,9 @@ Deno.serve(async (req: Request) => {
       const { cargoFinal, statusAuditoria } = auditarRegistro(dadosParaAuditoria);
       const horarioLancamento = formatNowBR();
 
-      // Metadado Unificado conforme solicitado: META APP=UNIFICADO TIPO={tipo} USER={nome}
       let metadado = `META APP=UNIFICADO TIPO=${tipo} USER=${nomeLancador}`;
       if (statusAuditoria) metadado = `${statusAuditoria} | ${metadado}`;
+      metadado = appendIdemToMetadado(metadado, idemKey);
 
       const linha = [
         horarioLancamento,
@@ -299,10 +341,11 @@ Deno.serve(async (req: Request) => {
       return json({
         sucesso: true,
         idGerado,
+        replayed: false,
         statusAuditoria: metadado,
         comprovante: {
           id: idGerado,
-          horario: new Date().toLocaleTimeString("pt-BR"),
+          horario: new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" }),
           cidade: dadosParaAuditoria.cidade,
           instrumento: dadosParaAuditoria.instrumento,
           ministerio: dadosParaAuditoria.ministerio,
@@ -314,7 +357,11 @@ Deno.serve(async (req: Request) => {
 
     // POST /registros/alerta
     if (req.method === "POST" && path === "/registros/alerta") {
-      const body = (await req.json().catch(() => ({}))) as { id?: string; aviso?: string; nomeLancador?: string };
+      const body = (await req.json().catch(() => ({}))) as {
+        id?: string;
+        aviso?: string;
+        nomeLancador?: string;
+      };
       const id = String(body.id || "").trim();
       const aviso = String(body.aviso || "").trim();
       const nomeLancador = String(body.nomeLancador || "Desconhecido").trim();
@@ -346,8 +393,9 @@ Deno.serve(async (req: Request) => {
       return json({ sucesso: true, id, rowNumber, aviso: novoAviso });
     }
 
-    return json({ erro: "Rota não encontrada", debug: { method: req.method, pathname, path } }, 404);
-  } catch (err: any) {
-    return json({ erro: "Erro interno", detalhe: String(err?.message || err) }, 500);
+    return json({ erro: "Rota não encontrada", debug: { method: req.method, path } }, 404);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return json({ erro: "Erro interno", detalhe: message }, 500);
   }
 });
