@@ -18,6 +18,8 @@ import {
   enviarRegistro,
   enviarAlerta,
   loadLastComprovante,
+  flushOfflineQueue,
+  getPendingQueueCount,
   type ConfigData,
   type Comprovante,
 } from '../../src/backend';
@@ -56,21 +58,24 @@ export default function LaunchScreen() {
   const [ultimoComprovante, setUltimoComprovante] = useState<Comprovante | null>(null);
   const [modoAlerta, setModoAlerta] = useState(false);
   const [textoAlerta, setTextoAlerta] = useState('');
+  const [pendingCount, setPendingCount] = useState(0);
 
   const carregarTudo = useCallback(async () => {
     setLoadError(null);
     try {
-      const [p, cfg, draft, trava, last] = await Promise.all([
+      const [p, cfg, draft, trava, last, pending] = await Promise.all([
         getPrefs(),
         getConfig(),
         loadFormDraft(),
         loadTravaCidade(),
         loadLastComprovante(),
+        getPendingQueueCount(),
       ]);
 
       setPrefs(p);
       setConfig(cfg);
       setTravaCidade(trava);
+      setPendingCount(pending);
 
       if (draft) {
         if (draft.cidade) setCidade(draft.cidade);
@@ -84,6 +89,14 @@ export default function LaunchScreen() {
         setUltimoComprovante(last);
         setUltimoId(last.id);
       }
+
+      if (!isDemoMode && isOnline && pending > 0) {
+        const result = await flushOfflineQueue();
+        setPendingCount(result.remaining);
+        if (result.flushed > 0) {
+          notify('Fila sincronizada', `${result.flushed} item(ns) enviados à planilha.`);
+        }
+      }
     } catch (err) {
       console.error(err);
       setLoadError('Não foi possível carregar as configurações.');
@@ -92,7 +105,7 @@ export default function LaunchScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [isDemoMode, isOnline]);
 
   useEffect(() => {
     carregarTudo();
@@ -147,11 +160,6 @@ export default function LaunchScreen() {
       return;
     }
 
-    if (!isDemoMode && !isOnline) {
-      notify('Sem conexão', 'Conecte-se à internet para lançar o ensaio.');
-      return;
-    }
-
     setEnviando(true);
     try {
       const payload = {
@@ -164,11 +172,16 @@ export default function LaunchScreen() {
         musicaCargo,
       };
 
-      const { idGerado: id, comprovante } = await enviarRegistro(payload);
+      const { idGerado: id, comprovante, queued } = await enviarRegistro(payload);
       setUltimoId(id);
       setUltimoComprovante(comprovante);
+      setPendingCount(await getPendingQueueCount());
 
-      notify('✓ Lançamento Registrado', `ID: ${id}`);
+      if (queued) {
+        notify('Salvo na fila offline', `Será sincronizado ao reconectar.\nRef: ${id}`);
+      } else {
+        notify('✓ Lançamento Registrado', `ID: ${id}`);
+      }
 
       setCategoria('');
       setInstrumento('');
@@ -195,20 +208,21 @@ export default function LaunchScreen() {
       return;
     }
 
-    if (!isDemoMode && !isOnline) {
-      notify('Sem conexão', 'Conecte-se à internet para enviar o alerta.');
-      return;
-    }
-
     setEnviando(true);
     try {
-      await enviarAlerta({
+      const result = await enviarAlerta({
         id: ultimoId,
         aviso: textoAlerta.trim(),
         nomeLancador: prefs.nomeLancador,
       });
 
-      notify('✓ Alerta Adicionado', `Registro ${ultimoId} atualizado.`);
+      setPendingCount(await getPendingQueueCount());
+
+      if (result.queued) {
+        notify('Alerta na fila', 'Será enviado quando houver conexão.');
+      } else {
+        notify('✓ Alerta Adicionado', `Registro ${ultimoId} atualizado.`);
+      }
       setTextoAlerta('');
       setModoAlerta(false);
       if (ultimoComprovante) {
@@ -272,7 +286,11 @@ export default function LaunchScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#34C759" />
         }
       >
-        <StatusBanners isDemoMode={isDemoMode} isOnline={isOnline} />
+        <StatusBanners
+          isDemoMode={isDemoMode}
+          isOnline={isOnline}
+          pendingCount={pendingCount}
+        />
 
         <View style={styles.header}>
           <View style={styles.headerTop}>

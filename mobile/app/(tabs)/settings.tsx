@@ -10,19 +10,22 @@ import {
   Platform,
 } from 'react-native';
 import { getPrefs, savePrefs, clearPrefs, UserPrefs } from '../../src/session';
-import { api } from '../../src/api';
-import { isDemo } from '../../src/backend';
+import { api, getApiAuthConfigured } from '../../src/api';
+import { flushOfflineQueue, getPendingQueueCount, isDemo } from '../../src/backend';
 import { notify } from '../../src/utils/notify';
 
 export default function SettingsScreen() {
   const [prefs, setPrefs] = useState<UserPrefs>({ nomeLancador: '', tipoSelecionado: null });
   const [nome, setNome] = useState('');
+  const [pending, setPending] = useState(0);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     (async () => {
       const p = await getPrefs();
       setPrefs(p);
       setNome(p.nomeLancador);
+      setPending(await getPendingQueueCount());
     })();
   }, []);
 
@@ -38,7 +41,7 @@ export default function SettingsScreen() {
 
   const handleTrocarTipo = async (novoTipo: 'IRMAOS' | 'IRMAS') => {
     await savePrefs({ tipoSelecionado: novoTipo });
-    setPrefs(prev => ({ ...prev, tipoSelecionado: novoTipo }));
+    setPrefs((prev) => ({ ...prev, tipoSelecionado: novoTipo }));
   };
 
   const handleLimparPrefs = () => {
@@ -52,10 +55,33 @@ export default function SettingsScreen() {
     );
   };
 
+  const handleFlush = async () => {
+    if (isDemo()) {
+      notify('Demo', 'Não há fila no modo demonstração.');
+      return;
+    }
+    setSyncing(true);
+    try {
+      const result = await flushOfflineQueue();
+      setPending(result.remaining);
+      if (result.flushed === 0 && result.remaining === 0) {
+        notify('Fila vazia', 'Nada pendente para sincronizar.');
+      } else {
+        notify(
+          'Sincronização',
+          `Enviados: ${result.flushed}. Restantes: ${result.remaining}.`
+        );
+      }
+    } catch (err) {
+      notify('Erro', String((err as Error)?.message || err));
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Identificação</Text>
           <Text style={styles.label}>Nome do Lançador</Text>
@@ -65,8 +91,13 @@ export default function SettingsScreen() {
             onChangeText={setNome}
             placeholder="Seu nome"
             placeholderTextColor="#8E8E93"
+            accessibilityLabel="Nome do lançador"
           />
-          <TouchableOpacity style={styles.button} onPress={handleSalvarNome}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSalvarNome}
+            accessibilityRole="button"
+          >
             <Text style={styles.buttonText}>Salvar Nome</Text>
           </TouchableOpacity>
         </View>
@@ -78,15 +109,47 @@ export default function SettingsScreen() {
               style={[styles.typeBtn, prefs.tipoSelecionado === 'IRMAOS' && styles.typeBtnActive]}
               onPress={() => handleTrocarTipo('IRMAOS')}
             >
-              <Text style={[styles.typeBtnText, prefs.tipoSelecionado === 'IRMAOS' && styles.typeBtnTextActive]}>Irmãos</Text>
+              <Text
+                style={[
+                  styles.typeBtnText,
+                  prefs.tipoSelecionado === 'IRMAOS' && styles.typeBtnTextActive,
+                ]}
+              >
+                Irmãos
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.typeBtn, prefs.tipoSelecionado === 'IRMAS' && styles.typeBtnActive]}
               onPress={() => handleTrocarTipo('IRMAS')}
             >
-              <Text style={[styles.typeBtnText, prefs.tipoSelecionado === 'IRMAS' && styles.typeBtnTextActive]}>Irmãs</Text>
+              <Text
+                style={[
+                  styles.typeBtnText,
+                  prefs.tipoSelecionado === 'IRMAS' && styles.typeBtnTextActive,
+                ]}
+              >
+                Irmãs
+              </Text>
             </TouchableOpacity>
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Sincronização</Text>
+          <View style={styles.infoBox}>
+            <Text style={styles.infoText}>Pendentes na fila: {pending}</Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.button, syncing && { opacity: 0.6 }]}
+            onPress={handleFlush}
+            disabled={syncing}
+            accessibilityRole="button"
+            accessibilityLabel="Sincronizar fila offline"
+          >
+            <Text style={styles.buttonText}>
+              {syncing ? 'Sincronizando…' : 'Sincronizar fila agora'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.section}>
@@ -94,7 +157,19 @@ export default function SettingsScreen() {
           <Text style={styles.label}>Endpoint da API</Text>
           <View style={styles.infoBox}>
             <Text style={styles.infoText}>
-              {isDemo() ? 'Modo Demo (sem backend) — dados simulados' : api.defaults.baseURL}
+              {isDemo()
+                ? 'Modo Demo (sem backend) — dados simulados'
+                : api.defaults.baseURL}
+            </Text>
+          </View>
+          <Text style={[styles.label, { marginTop: 12 }]}>Auth do app</Text>
+          <View style={styles.infoBox}>
+            <Text style={styles.infoText}>
+              {isDemo()
+                ? 'N/A no demo'
+                : getApiAuthConfigured()
+                  ? 'Token do app configurado (Bearer)'
+                  : 'Token não configurado no cliente — configure EXPO_PUBLIC_APP_API_TOKEN'}
             </Text>
           </View>
         </View>
@@ -103,7 +178,7 @@ export default function SettingsScreen() {
           <Text style={styles.dangerButtonText}>Limpar Preferências Locais</Text>
         </TouchableOpacity>
 
-        <Text style={styles.footer}>LançaEnsaio Unificado v2.1 · qualidade / auditoria testada</Text>
+        <Text style={styles.footer}>LançaEnsaio Unificado v2.2 · auth + fila offline</Text>
       </View>
     </ScrollView>
   );

@@ -5,26 +5,37 @@ import { StyleSheet, Text, View } from 'react-native';
 type Props = {
   isDemoMode: boolean;
   isOnline: boolean;
+  pendingCount?: number;
 };
 
-export function StatusBanners({ isDemoMode, isOnline }: Props) {
-  if (isDemoMode) {
-    return (
-      <View style={[styles.banner, styles.demo]} accessibilityRole="text">
-        <Text style={styles.demoText}>Modo demonstração — registros ficam só neste dispositivo</Text>
-      </View>
-    );
-  }
+export function StatusBanners({ isDemoMode, isOnline, pendingCount = 0 }: Props) {
+  return (
+    <View>
+      {isDemoMode ? (
+        <View style={[styles.banner, styles.demo]} accessibilityRole="text">
+          <Text style={styles.demoText}>
+            Modo demonstração — registros ficam só neste dispositivo
+          </Text>
+        </View>
+      ) : null}
 
-  if (!isOnline) {
-    return (
-      <View style={[styles.banner, styles.offline]} accessibilityRole="alert">
-        <Text style={styles.offlineText}>Sem conexão — o lançamento precisa de internet</Text>
-      </View>
-    );
-  }
+      {!isDemoMode && !isOnline ? (
+        <View style={[styles.banner, styles.offline]} accessibilityRole="alert">
+          <Text style={styles.offlineText}>
+            Sem conexão — novos lançamentos entram na fila offline
+          </Text>
+        </View>
+      ) : null}
 
-  return null;
+      {!isDemoMode && pendingCount > 0 ? (
+        <View style={[styles.banner, styles.pending]} accessibilityRole="text">
+          <Text style={styles.pendingText}>
+            {pendingCount} item(ns) aguardando sincronização com a planilha
+          </Text>
+        </View>
+      ) : null}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -52,6 +63,17 @@ const styles = StyleSheet.create({
   },
   offlineText: {
     color: '#FF453A',
+    fontSize: 13,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  pending: {
+    backgroundColor: 'rgba(10, 132, 255, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(10, 132, 255, 0.35)',
+  },
+  pendingText: {
+    color: '#0A84FF',
     fontSize: 13,
     fontWeight: '700',
     textAlign: 'center',
