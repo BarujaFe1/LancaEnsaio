@@ -36,9 +36,10 @@
 ## Fluxos
 
 1. **Setup** — nome + modo (Irmãos/Irmãs) → AsyncStorage  
-2. **Lançar** — valida domínio → POST `/registros` (ou demo) → comprovante  
-3. **Alerta** — POST `/registros/alerta` anexa texto na coluna de auditoria  
-4. **Config** — GET `/config` lê catálogos da planilha  
+2. **Lançar** — valida domínio → POST `/registros` (Bearer + Idempotency-Key) → comprovante  
+3. **Offline** — enfileira localmente; flush no refresh/Configurações (replay idempotente)  
+4. **Alerta** — POST `/registros/alerta` anexa texto na coluna de auditoria  
+5. **Config** — GET `/config` lê catálogos da planilha (requer token se enforced)  
 
 ## Demo mode
 

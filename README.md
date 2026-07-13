@@ -23,22 +23,16 @@
 
 ---
 
-## Screenshot / placeholder
+## Screenshots
 
-> Substitua pelos arquivos em `docs/screenshots/` quando disponíveis.
+| Setup | Lançamento | Comprovante | Web demo |
+|-------|------------|-------------|----------|
+| ![setup](./docs/screenshots/01-setup.png) | ![lancamento](./docs/screenshots/02-lancamento.png) | ![comprovante](./docs/screenshots/03-comprovante.png) | ![web](./docs/screenshots/04-web-demo.png) |
 
-```text
-┌─────────────────────────────┐
-│  LançaEnsaio                │
-│  Setup → Lançar → Recibo    │
-│  [Irmãos] [Irmãs]           │
-│  Cidade · Instrumento       │
-│  [ Lançar Agora ]           │
-│  ID + auditoria automática  │
-└─────────────────────────────┘
-```
+Demo ao vivo: **https://lancaensaio.vercel.app**  
+> A demo pública pode estar em build anterior até o redeploy Vercel desta branch. O código-fonte desta branch é a fonte de verdade.
 
-Demo ao vivo: **https://lancaensaio.vercel.app**
+Case study: [`docs/CASE_STUDY.md`](./docs/CASE_STUDY.md) · Roteiro 3–5 min: [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md)
 
 ---
 
@@ -62,11 +56,12 @@ App mobile (Expo) com fluxo guiado de **menos de um minuto**: identificar o lan�
 - Setup inicial (nome + modo) com persistência local
 - Fluxos distintos **Irmãos** / **Irmãs**
 - Catálogo dinâmico (cidades, instrumentos, ministérios, cargos) via API
-- Regras de auditoria (Cantor/Cantora padrão, erros 01–05/11)
+- Regras de auditoria (Cantor/Cantora padrão, erros 01–05/11) **com testes**
 - Comprovante do último lançamento + alerta de correção
-- Trava de cidade para sequência no mesmo local
-- Draft local do formulário
-- Banner de **demo** e de **offline**
+- **Auth por app token** na Edge Function (Bearer / `x-app-token`)
+- **Fila offline** com `Idempotency-Key` (sem duplicar linha no retry)
+- Trava de cidade + draft local do formulário
+- Banner de demo / offline / pendências de sync
 - Web demo sem backend (modo mock) para recrutadores
 
 ---
@@ -75,10 +70,11 @@ App mobile (Expo) com fluxo guiado de **menos de um minuto**: identificar o lan�
 
 ```text
 App Expo (Android/Web)
-    │  axios  ou  demo local
+    │  Bearer app token + Idempotency-Key
+    │  (ou demo local / fila offline)
     ▼
 Supabase Edge Function `api`
-    │  service account
+    │  auth → auditoria → Sheets API (service account)
     ▼
 Google Sheets (Base Geral / Dados Geral)
 ```
@@ -143,7 +139,9 @@ Ver `mobile/.env.example` e [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md).
 | Variável | Onde | Uso |
 |----------|------|-----|
 | `EXPO_PUBLIC_API_URL` | App / EAS | Base da Edge Function |
+| `EXPO_PUBLIC_APP_API_TOKEN` | App / EAS | Mesmo valor de `APP_API_TOKEN` |
 | `EXPO_PUBLIC_DEMO` | App (opcional) | Força modo demo |
+| `APP_API_TOKEN` | Supabase secret | Auth da API |
 | `ORQUESTRA_SHEET_ID` | Supabase secret | Planilha |
 | `GOOGLE_SERVICE_ACCOUNT_B64` | Supabase secret | Credencial Sheets |
 
@@ -155,7 +153,7 @@ Ver `mobile/.env.example` e [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md).
 cd mobile && npm test
 ```
 
-Cobertura atual: regras de auditoria + limpeza de formulário.  
+Cobertura atual: auditoria, form-state, auth/idempotência/fila (**25 testes**).  
 Guia: [`docs/TESTING.md`](./docs/TESTING.md)
 
 ---
@@ -165,26 +163,30 @@ Guia: [`docs/TESTING.md`](./docs/TESTING.md)
 Resumo em [`docs/TECHNICAL_DECISIONS.md`](./docs/TECHNICAL_DECISIONS.md):
 
 - Sheets como sistema operacional (familiaridade > modelo relacional)
-- Identificação por nome (baixa fricção > auth forte)
+- Identificação por nome + **token de app** (baixa fricção; não é login JWT)
 - Demo mode automático para portfólio web
 - Domínio de auditoria testável no cliente e no servidor
+- Fila offline com idempotência em vez de bloquear o lançamento
 
-**Trade-off consciente:** a API ainda não exige JWT de usuário. Isso é documentado em [`SECURITY_NOTES.md`](./SECURITY_NOTES.md) com caminho de hardening.
+**Trade-off consciente:** o token de app vai no bundle (`EXPO_PUBLIC_*`). Mitiga abuso casual da URL; não substitui auth de usuário. Ver [`SECURITY_NOTES.md`](./SECURITY_NOTES.md).
 
 ---
 
 ## Roadmap
 
-- [ ] Auth / token compartilhado na Edge Function
-- [ ] Fila offline com retry
-- [ ] Screenshots reais no README
+- [x] Auth por app token na Edge Function
+- [x] Fila offline com idempotência
+- [x] Screenshots no README
 - [ ] Unificar módulo de auditoria mobile ↔ Deno (pacote shared)
+- [ ] JWT / login de usuário + rate limit
 - [ ] Observabilidade (logs estruturados / alertas de falha Sheets)
+- [ ] Vídeo MP4 publicado (roteiro pronto)
 
 ## Status atual
 
-**Produção real (APK) + demo web pública.**  
-Quality pass 2026-07: testes, CI, docs, UX de confiabilidade e sanitização de docs sensíveis.
+**APK operacional + demo web pública + quality/security pass nesta branch.**  
+Claims seguros: automação operacional mobile, integração Edge Function → Sheets, regras testáveis, fila offline, CI.  
+Evitar: “enterprise”, “IA”, “segurança à prova de invasão”, “produção 24/7 com SLAs”.
 
 ---
 
@@ -202,19 +204,23 @@ Quality pass 2026-07: testes, CI, docs, UX de confiabilidade e sanitização de 
 ## Como eu apresentaria em entrevista
 
 1. **Contexto:** “Substitui lançamento manual inconsistente em ensaio regional.”  
-2. **Fluxo:** abrir → setup → lançar → ID + auditoria na planilha.  
-3. **Decisão dura:** Sheets como sink operacional; Edge Function como gate de regras.  
-4. **Qualidade:** mostro os testes de auditoria e o CI.  
-5. **Honestidade:** API ainda sem auth de usuário — trade-off de fricção vs risco, com plano de harden.  
-6. **Demo:** abro https://lancaensaio.vercel.app e faço um lançamento ao vivo.
+2. **Fluxo:** setup → lançar → ID + auditoria na planilha.  
+3. **Decisão dura:** Sheets como sink; Edge Function como gate de regras + token.  
+4. **Qualidade:** mostro testes de auditoria/idempotência e o CI.  
+5. **Offline:** enfileira com `Idempotency-Key` e sincroniza sem duplicar.  
+6. **Honestidade:** token no cliente; próximo passo seria JWT de usuário.  
+7. **Demo:** https://lancaensaio.vercel.app + [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md).
 
 ---
 
 ## Documentação
 
+- [`docs/PORTFOLIO_HANDOFF.md`](./docs/PORTFOLIO_HANDOFF.md)
+- [`docs/CASE_STUDY.md`](./docs/CASE_STUDY.md)
 - [`docs/AUDIT_REPORT.md`](./docs/AUDIT_REPORT.md)
 - [`docs/HANDOFF.md`](./docs/HANDOFF.md)
 - [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md)
+- [`CHANGELOG.md`](./CHANGELOG.md)
 - [`COMECE_AQUI.md`](./COMECE_AQUI.md) · [`COMO_GERAR_APK.md`](./COMO_GERAR_APK.md)
 
 ---

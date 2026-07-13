@@ -15,8 +15,9 @@ npm run ci
 
 | Suite | Cobertura |
 |-------|-----------|
-| `src/domain/__tests__/auditoria.test.ts` | Regras IRMAOS/IRMAS, IDs, validação pré-envio |
-| `src/domain/__tests__/form-state.test.ts` | Limpeza de formulário com/sem trava de cidade |
+| `auditoria.test.ts` | Regras IRMAOS/IRMAS, IDs, validação pré-envio |
+| `form-state.test.ts` | Limpeza de formulário com/sem trava de cidade |
+| `offline-auth-idem.test.ts` | Fila offline, app token, idempotência Sheets |
 
 Jest roda em ambiente `node` (`jest.config.js`) para manter os testes de domínio estáveis sem o polyfill nativo do `jest-expo`.
 

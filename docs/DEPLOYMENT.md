@@ -6,6 +6,7 @@
 
 ```env
 EXPO_PUBLIC_API_URL=https://SEU_PROJECT_REF.supabase.co/functions/v1/api
+EXPO_PUBLIC_APP_API_TOKEN=troque-por-um-token-longo-e-aleatorio
 # EXPO_PUBLIC_DEMO=true
 ```
 
@@ -15,6 +16,7 @@ Copie de `mobile/.env.example`.
 
 ```bash
 supabase secrets set \
+  APP_API_TOKEN=... \
   ORQUESTRA_SHEET_ID=... \
   GOOGLE_SERVICE_ACCOUNT_B64=...
 ```
