@@ -51,3 +51,8 @@ _scan_output/
 
 # Deploy local
 .vercel
+
+# Additional ignores
+.next/
+target/
+.venv/
