@@ -9,6 +9,7 @@ const DEMO_FLAG = (process.env.EXPO_PUBLIC_DEMO || '').trim().toLowerCase() === 
 
 // Modo demo ativo quando não há backend configurado (ex.: Vercel) ou flag explícita.
 export const isDemo = (): boolean => !API_URL || DEMO_FLAG;
+export const getApiUrl = (): string => API_URL;
 
 export type ConfigData = {
   instrumentos: Record<string, string[]>;
@@ -44,20 +45,55 @@ type DemoLogEntry = Comprovante & {
 };
 
 const DEMO_INSTRUMENTOS: Record<string, string[]> = {
-  Cordas: ['Violão', 'Viola', 'Cavaquinho', 'Baixo Acústico', 'Baixo Elétrico'],
-  Sopros: ['Flauta', 'Saxofone', 'Trompete', 'Clarinete', 'Sax Barítono'],
-  Percussão: ['Bateria', 'Pandeiro', 'Timba', 'Surdo', 'Caixa'],
-  Teclas: ['Teclado', 'Piano', 'Órgão'],
+  Cordas: ['Violino', 'Viola', 'Violoncelo'],
+  Metais: [
+    'Barítono (Pisto)',
+    'Cornet',
+    'Eufônio',
+    'Flugelhorn',
+    'Trombone',
+    'Trombonito',
+    'Trompa',
+    'Trompete',
+    'Tuba',
+  ],
+  Madeiras: [
+    'Clarinete',
+    'Clarinete Alto',
+    'Clarinete Baixo (Clarone)',
+    'Corne Inglês',
+    'Fagote',
+    'Flauta',
+    'Oboé',
+    "Oboé D'Amore",
+    'Saxofone Alto',
+    'Saxofone Baritono',
+    'Saxofone Soprano (Reto)',
+    'Saxofone Tenor',
+  ],
+  Teclas: ['Acordeon'],
 };
 
-const DEMO_MINISTERIOS = ['Louvor', 'Liturgia', 'Instrumental', 'Voz & Harmonia', 'Coral'];
-const DEMO_CARGOS = ['Solista', 'Backing Vocal', 'Regente', 'Primeiro Instrumento', 'Segundo Instrumento'];
+const DEMO_MINISTERIOS = [
+  'Ancião',
+  'Diácono',
+  'Cooperador de Ofício',
+  'Cooperador de Jovens',
+];
+
+const DEMO_CARGOS = [
+  'Encarregado Regional',
+  'Encarregado Local',
+  'Instrutor',
+];
 
 const DEMO_LOG_KEY = '@ensaio/demo_log_v1';
 
 function demoCidades(): string[] {
   return CITY_GROUPS_FIXED.reduce<string[]>((acc, g) => acc.concat(g.items), []);
 }
+
+const isGoogleScript = API_URL.includes('script.google.com');
 
 export async function getConfig(): Promise<ConfigData> {
   if (isDemo()) {
@@ -68,6 +104,30 @@ export async function getConfig(): Promise<ConfigData> {
       cargosMusicais: DEMO_CARGOS,
     };
   }
+
+  if (isGoogleScript) {
+    try {
+      const resp = await fetch(`${API_URL}?action=config`);
+      const data = await resp.json();
+      if (data?.sucesso) {
+        return {
+          cidades: data.cidades?.length ? data.cidades : demoCidades(),
+          instrumentos: data.instrumentos || DEMO_INSTRUMENTOS,
+          ministerios: data.ministerios?.length ? data.ministerios : DEMO_MINISTERIOS,
+          cargosMusicais: data.cargosMusicais?.length ? data.cargosMusicais : DEMO_CARGOS,
+        };
+      }
+    } catch (err) {
+      console.warn('Falha ao carregar config da planilha via Apps Script, usando local:', err);
+    }
+    return {
+      cidades: demoCidades(),
+      instrumentos: DEMO_INSTRUMENTOS,
+      ministerios: DEMO_MINISTERIOS,
+      cargosMusicais: DEMO_CARGOS,
+    };
+  }
+
   const res = await api.get('/config');
   return res.data;
 }
@@ -106,6 +166,22 @@ export async function enviarRegistro(
     return { idGerado: id, comprovante };
   }
 
+  if (isGoogleScript) {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'registro', ...payload }),
+    });
+    const data = await resp.json();
+    if (!data?.sucesso) {
+      throw new Error(data?.erro || 'Falha ao gravar na planilha Google');
+    }
+    return {
+      idGerado: data.idGerado,
+      comprovante: data.comprovante || null,
+    };
+  }
+
   const res = await api.post('/registros', payload);
   return { idGerado: res.data?.idGerado || 'SUCESSO', comprovante: res.data?.comprovante || null };
 }
@@ -126,6 +202,19 @@ export async function enviarAlerta(params: {
       }
     } catch {
       // ignora falha de persistência local
+    }
+    return;
+  }
+
+  if (isGoogleScript) {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'alerta', ...params }),
+    });
+    const data = await resp.json();
+    if (!data?.sucesso) {
+      throw new Error(data?.erro || 'Falha ao adicionar alerta');
     }
     return;
   }

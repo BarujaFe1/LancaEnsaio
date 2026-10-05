@@ -26,6 +26,44 @@ function ExtLink({ href, label }: { href: string; label: string }) {
 export function WebSiteHeader() {
   if (Platform.OS !== 'web') return null;
 
+  const [installPrompt, setInstallPrompt] = React.useState<any>(null);
+  const [isStandalone, setIsStandalone] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    if (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true
+    ) {
+      setIsStandalone(true);
+    }
+
+    const handler = (e: any) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (installPrompt) {
+      installPrompt.prompt();
+      const choice = await installPrompt.userChoice;
+      if (choice?.outcome === 'accepted') {
+        setInstallPrompt(null);
+      }
+    } else {
+      alert(
+        '📱 Para instalar o LançaEnsaio no celular:\n\n' +
+        '• No Chrome/Android: toque no menu (⋮) e escolha "Instalar aplicativo" ou "Adicionar à tela inicial".\n\n' +
+        '• No Safari/iPhone: toque no botão Compartilhar (ícone com seta) e selecione "Adicionar à Tela de Início".'
+      );
+    }
+  };
+
   return (
     <View style={styles.bar}>
       <View style={styles.left}>
@@ -40,6 +78,11 @@ export function WebSiteHeader() {
         </View>
       </View>
       <View style={styles.links}>
+        {!isStandalone && (
+          <TouchableOpacity style={styles.installBtn} onPress={handleInstall} activeOpacity={0.8}>
+            <Text style={styles.installBtnText}>📲 Instalar App</Text>
+          </TouchableOpacity>
+        )}
         <ExtLink href={PORTFOLIO_URL} label="← Portfólio" />
         <ExtLink href={REPO_URL} label="GitHub ↗" />
       </View>
@@ -95,12 +138,24 @@ const styles = StyleSheet.create({
   },
   links: {
     flexDirection: 'row',
+    alignItems: 'center',
     flexWrap: 'wrap',
-    gap: 16,
+    gap: 12,
   },
   link: {
     color: '#34C759',
     fontSize: 13,
     fontWeight: '700',
+  },
+  installBtn: {
+    backgroundColor: '#34C759',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  installBtnText: {
+    color: '#0F1115',
+    fontSize: 12,
+    fontWeight: '800',
   },
 });

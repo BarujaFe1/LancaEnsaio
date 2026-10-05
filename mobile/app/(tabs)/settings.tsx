@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { getPrefs, savePrefs, clearPrefs, UserPrefs } from '../../src/session';
 import { api } from '../../src/api';
-import { isDemo } from '../../src/backend';
+import { isDemo, getApiUrl } from '../../src/backend';
 import { notify } from '../../src/utils/notify';
 
 export default function SettingsScreen() {
@@ -94,7 +94,7 @@ export default function SettingsScreen() {
           <Text style={styles.label}>Endpoint da API</Text>
           <View style={styles.infoBox}>
             <Text style={styles.infoText}>
-              {isDemo() ? 'Modo Demo (sem backend) — dados simulados' : api.defaults.baseURL}
+              {isDemo() ? 'Modo Demo (sem backend) — dados simulados' : getApiUrl() || api.defaults.baseURL}
             </Text>
           </View>
         </View>

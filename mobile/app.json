@@ -31,6 +31,15 @@
       "expo-font",
       "expo-router",
       "expo-web-browser"
-    ]
+    ],
+    "web": {
+      "favicon": "./assets/icon.png",
+      "name": "LançaEnsaio",
+      "shortName": "LançaEnsaio",
+      "themeColor": "#0F1115",
+      "backgroundColor": "#0F1115",
+      "display": "standalone",
+      "orientation": "portrait"
+    }
   }
 }
