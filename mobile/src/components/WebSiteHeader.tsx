@@ -23,6 +23,8 @@ function ExtLink({ href, label }: { href: string; label: string }) {
   );
 }
 
+import { isDemo } from '../backend';
+
 export function WebSiteHeader() {
   if (Platform.OS !== 'web') return null;
 
@@ -74,7 +76,11 @@ export function WebSiteHeader() {
               {b}
             </Text>
           ))}
-          <Text style={[styles.badge, styles.badgeDemo]}>Demo</Text>
+          {isDemo() ? (
+            <Text style={[styles.badge, styles.badgeDemo]}>Demo</Text>
+          ) : (
+            <Text style={[styles.badge, styles.badgeLive]}>● Conectado</Text>
+          )}
         </View>
       </View>
       <View style={styles.links}>
@@ -135,6 +141,11 @@ const styles = StyleSheet.create({
     color: '#0F1115',
     backgroundColor: '#FFD60A',
     borderColor: '#FFD60A',
+  },
+  badgeLive: {
+    color: '#34C759',
+    backgroundColor: 'rgba(52, 199, 89, 0.15)',
+    borderColor: '#34C759',
   },
   links: {
     flexDirection: 'row',
