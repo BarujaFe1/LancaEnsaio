@@ -93,7 +93,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: 20,
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
   },
   title: {
     color: '#FFFFFF',

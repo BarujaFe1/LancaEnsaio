@@ -19,6 +19,7 @@ export type ConfigData = {
 };
 
 export type RegistroPayload = {
+  id?: string;
   tipo: 'IRMAOS' | 'IRMAS' | null;
   nomeLancador: string;
   cidade: string;
@@ -95,56 +96,84 @@ function demoCidades(): string[] {
 
 const isGoogleScript = API_URL.includes('script.google.com');
 
-export async function getConfig(): Promise<ConfigData> {
-  if (isDemo()) {
-    return {
-      cidades: demoCidades(),
-      instrumentos: DEMO_INSTRUMENTOS,
-      ministerios: DEMO_MINISTERIOS,
-      cargosMusicais: DEMO_CARGOS,
-    };
-  }
+// Cache local em memória do catálogo para resposta instantânea (0ms)
+let cachedConfig: ConfigData = {
+  cidades: demoCidades(),
+  instrumentos: DEMO_INSTRUMENTOS,
+  ministerios: DEMO_MINISTERIOS,
+  cargosMusicais: DEMO_CARGOS,
+};
 
+let configFetchPromise: Promise<ConfigData> | null = null;
+
+async function syncConfigFromRemote(): Promise<ConfigData> {
   if (isGoogleScript) {
     try {
       const resp = await fetch(`${API_URL}?action=config`);
       const data = await resp.json();
       if (data?.sucesso) {
-        return {
+        cachedConfig = {
           cidades: data.cidades?.length ? data.cidades : demoCidades(),
           instrumentos: data.instrumentos || DEMO_INSTRUMENTOS,
           ministerios: data.ministerios?.length ? data.ministerios : DEMO_MINISTERIOS,
           cargosMusicais: data.cargosMusicais?.length ? data.cargosMusicais : DEMO_CARGOS,
         };
+        return cachedConfig;
       }
     } catch (err) {
-      console.warn('Falha ao carregar config da planilha via Apps Script, usando local:', err);
+      console.warn('Sync background de config falhou:', err);
     }
-    return {
-      cidades: demoCidades(),
-      instrumentos: DEMO_INSTRUMENTOS,
-      ministerios: DEMO_MINISTERIOS,
-      cargosMusicais: DEMO_CARGOS,
-    };
+  } else if (!isDemo()) {
+    try {
+      const res = await api.get('/config');
+      if (res?.data) {
+        cachedConfig = res.data;
+        return cachedConfig;
+      }
+    } catch (err) {
+      console.warn('Sync background /config falhou:', err);
+    }
   }
-
-  const res = await api.get('/config');
-  return res.data;
+  return cachedConfig;
 }
 
-function gerarId(): string {
-  const now = new Date();
-  const seq = Math.floor(Math.random() * 9000) + 1000;
-  return `ENS-${now.getFullYear()}-${seq}`;
+export async function getConfig(forceRefresh = false): Promise<ConfigData> {
+  // Retorna instantâneo do cache para o usuário nunca esperar tela em branco
+  if (!forceRefresh) {
+    // Dispara sincronização silenciosa em background sem travar UI
+    if (!configFetchPromise) {
+      configFetchPromise = syncConfigFromRemote().finally(() => {
+        configFetchPromise = null;
+      });
+    }
+    return cachedConfig;
+  }
+
+  return await syncConfigFromRemote();
+}
+
+export function gerarIdRegistro(tipo: 'IRMAOS' | 'IRMAS' | null, nomeLancador: string): string {
+  const rand = Math.floor(Math.random() * 9000 + 1000).toString();
+  if (tipo === 'IRMAS') return 'F' + rand;
+  const palavras = (nomeLancador || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/[^A-Z\s]/g, '')
+    .split(/\s+/)
+    .filter(Boolean);
+  const partes = palavras.map(p => p.slice(0, 3)).join('');
+  return 'M' + (partes || 'USR') + rand;
 }
 
 export async function enviarRegistro(
   payload: RegistroPayload
 ): Promise<{ idGerado: string; comprovante: Comprovante | null }> {
+  const idUsado = payload.id || gerarIdRegistro(payload.tipo, payload.nomeLancador);
+
   if (isDemo()) {
-    const id = gerarId();
     const comprovante: Comprovante = {
-      id,
+      id: idUsado,
       horario: formatDeviceTimestamp(),
       cidade: payload.cidade,
       instrumento: payload.instrumento || '-',
@@ -163,26 +192,26 @@ export async function enviarRegistro(
       // ignora falha de persistência local
     }
 
-    return { idGerado: id, comprovante };
+    return { idGerado: idUsado, comprovante };
   }
 
   if (isGoogleScript) {
     const resp = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'registro', ...payload }),
+      body: JSON.stringify({ action: 'registro', ...payload, id: idUsado }),
     });
     const data = await resp.json();
     if (!data?.sucesso) {
       throw new Error(data?.erro || 'Falha ao gravar na planilha Google');
     }
     return {
-      idGerado: data.idGerado,
+      idGerado: data.idGerado || idUsado,
       comprovante: data.comprovante || null,
     };
   }
 
-  const res = await api.post('/registros', payload);
+  const res = await api.post('/registros', { ...payload, id: idUsado });
   return { idGerado: res.data?.idGerado || 'SUCESSO', comprovante: res.data?.comprovante || null };
 }
 

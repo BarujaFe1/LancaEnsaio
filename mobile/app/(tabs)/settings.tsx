@@ -111,7 +111,7 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0F1115' },
-  content: { padding: 24 },
+  content: { padding: 20, width: '100%', maxWidth: 520, alignSelf: 'center' },
   section: { marginBottom: 32 },
   sectionTitle: { color: '#34C759', fontSize: 18, fontWeight: '900', marginBottom: 16, textTransform: 'uppercase' },
   label: { color: '#E5E7EB', fontWeight: '700', marginBottom: 8, fontSize: 14 },

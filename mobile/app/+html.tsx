@@ -24,6 +24,25 @@ export default function Root({ children }: PropsWithChildren) {
         <link rel="icon" type="image/png" href="/icon-192.png" />
 
         <ScrollViewStyleReset />
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              html, body, #root {
+                background-color: #0F1115 !important;
+                margin: 0;
+                padding: 0;
+                min-height: 100%;
+                width: 100%;
+                overflow-x: hidden;
+                -webkit-tap-highlight-color: transparent;
+                color: #FFFFFF;
+              }
+              *, *::before, *::after {
+                box-sizing: border-box;
+              }
+            `,
+          }}
+        />
 
         {/* Service Worker Registration */}
         <script

@@ -32,6 +32,21 @@ const pwaHead = `
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="LançaEnsaio" />
+    <style>
+      html, body, #root {
+        background-color: #0F1115 !important;
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+        width: 100%;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+        color: #FFFFFF;
+      }
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+    </style>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {

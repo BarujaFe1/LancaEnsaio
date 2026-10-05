@@ -61,7 +61,13 @@ export default function RootLayout() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#0F1115', flexDirection: 'column' },
-  app: { flex: 1 },
+  app: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 520,
+    alignSelf: 'center',
+    backgroundColor: '#0F1115',
+  },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',

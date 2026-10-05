@@ -125,7 +125,7 @@ function doPost(e) {
     }
     
     // Gerar ID
-    var idGerado = gerarId(tipo, nomeLancador);
+    var idGerado = (data.id && String(data.id).trim()) ? String(data.id).trim() : gerarId(tipo, nomeLancador);
     var meta = 'META APP=UNIFICADO TIPO=' + tipo + ' USER=' + nomeLancador;
     var colunaAudit = (auditoriaMsgs.length > 0 ? auditoriaMsgs.join(' | ') + ' | ' : '') + meta;
     

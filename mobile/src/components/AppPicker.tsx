@@ -25,21 +25,29 @@ function ensureWebPickerTheme() {
   style.id = WEB_PICKER_STYLE_ID;
   style.textContent = `
     select {
+      box-sizing: border-box !important;
       color: #FFFFFF !important;
       background-color: #0F1115 !important;
       border: none !important;
       outline: none !important;
       font-size: 15px !important;
       font-weight: 600 !important;
-      padding: 0 12px !important;
+      padding: 0 38px 0 14px !important;
       height: 50px !important;
       width: 100% !important;
+      max-width: 100% !important;
       appearance: none;
       -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2334C759' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 18px;
+      cursor: pointer;
     }
     select option {
       color: #FFFFFF !important;
-      background-color: #0F1115 !important;
+      background-color: #1A1D25 !important;
+      padding: 8px 12px !important;
     }
   `;
   document.head.appendChild(style);
