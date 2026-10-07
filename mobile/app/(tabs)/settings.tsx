@@ -9,7 +9,14 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
-import { getPrefs, savePrefs, clearPrefs, UserPrefs } from '../../src/session';
+import {
+  getPrefs,
+  savePrefs,
+  clearPrefs,
+  getCustomCities,
+  removeCustomCity,
+  UserPrefs,
+} from '../../src/session';
 import { api } from '../../src/api';
 import { isDemo, getApiUrl } from '../../src/backend';
 import { notify } from '../../src/utils/notify';
@@ -17,13 +24,18 @@ import { notify } from '../../src/utils/notify';
 export default function SettingsScreen() {
   const [prefs, setPrefs] = useState<UserPrefs>({ nomeLancador: '', tipoSelecionado: null });
   const [nome, setNome] = useState('');
+  const [customCities, setCustomCities] = useState<string[]>([]);
+
+  const carregarDados = async () => {
+    const p = await getPrefs();
+    setPrefs(p);
+    setNome(p.nomeLancador);
+    const cities = await getCustomCities();
+    setCustomCities(cities);
+  };
 
   useEffect(() => {
-    (async () => {
-      const p = await getPrefs();
-      setPrefs(p);
-      setNome(p.nomeLancador);
-    })();
+    carregarDados();
   }, []);
 
   const handleSalvarNome = async () => {
@@ -39,6 +51,12 @@ export default function SettingsScreen() {
   const handleTrocarTipo = async (novoTipo: 'IRMAOS' | 'IRMAS') => {
     await savePrefs({ tipoSelecionado: novoTipo });
     setPrefs(prev => ({ ...prev, tipoSelecionado: novoTipo }));
+  };
+
+  const handleRemoverCidade = async (cidade: string) => {
+    const updated = await removeCustomCity(cidade);
+    setCustomCities(updated);
+    notify('Removida', `Cidade "${cidade}" removida das opções personalizadas.`);
   };
 
   const handleLimparPrefs = () => {
@@ -89,6 +107,24 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        {customCities.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Cidades Adicionadas ({customCities.length})</Text>
+            {customCities.map((c) => (
+              <View key={c} style={styles.cityCard}>
+                <Text style={styles.cityNameText}>{c}</Text>
+                <TouchableOpacity
+                  onPress={() => handleRemoverCidade(c)}
+                  style={styles.deleteCityBtn}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.deleteCityBtnText}>✕ Remover</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Infraestrutura</Text>
           <Text style={styles.label}>Endpoint da API</Text>
@@ -114,6 +150,36 @@ const styles = StyleSheet.create({
   content: { padding: 20, width: '100%', maxWidth: 520, alignSelf: 'center' },
   section: { marginBottom: 32 },
   sectionTitle: { color: '#34C759', fontSize: 18, fontWeight: '900', marginBottom: 16, textTransform: 'uppercase' },
+  cityCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#161922',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  cityNameText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+    flex: 1,
+    marginRight: 8,
+  },
+  deleteCityBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 69, 58, 0.15)',
+  },
+  deleteCityBtnText: {
+    color: '#FF453A',
+    fontSize: 12,
+    fontWeight: '800',
+  },
   label: { color: '#E5E7EB', fontWeight: '700', marginBottom: 8, fontSize: 14 },
   input: {
     backgroundColor: '#232732',

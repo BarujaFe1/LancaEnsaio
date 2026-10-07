@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from './api';
 import { CITY_GROUPS_FIXED } from './constants/cidades';
 import { formatDeviceTimestamp } from './utils/date';
+import { getCustomCities } from './session';
 
 const API_URL = (process.env.EXPO_PUBLIC_API_URL || '').trim();
 const DEMO_FLAG = (process.env.EXPO_PUBLIC_DEMO || '').trim().toLowerCase() === 'true';
@@ -137,7 +138,14 @@ async function syncConfigFromRemote(): Promise<ConfigData> {
   return cachedConfig;
 }
 
+export function toAsciiJson(obj: unknown): string {
+  return JSON.stringify(obj).replace(/[\u007F-\uFFFF]/g, (chr) =>
+    '\\u' + chr.charCodeAt(0).toString(16).padStart(4, '0')
+  );
+}
+
 export async function getConfig(forceRefresh = false): Promise<ConfigData> {
+  let base: ConfigData;
   // Retorna instantâneo do cache para o usuário nunca esperar tela em branco
   if (!forceRefresh) {
     // Dispara sincronização silenciosa em background sem travar UI
@@ -146,10 +154,35 @@ export async function getConfig(forceRefresh = false): Promise<ConfigData> {
         configFetchPromise = null;
       });
     }
-    return cachedConfig;
+    base = cachedConfig;
+  } else {
+    base = await syncConfigFromRemote();
   }
 
-  return await syncConfigFromRemote();
+  // Mescla cidades personalizadas cadastradas pelo usuário
+  try {
+    const custom = await getCustomCities();
+    if (custom && custom.length > 0) {
+      const allCities = [...custom, ...base.cidades];
+      const seen = new Set<string>();
+      const deduped: string[] = [];
+      for (const c of allCities) {
+        const trimmed = (c || '').trim();
+        if (trimmed && !seen.has(trimmed.toLowerCase())) {
+          seen.add(trimmed.toLowerCase());
+          deduped.push(trimmed);
+        }
+      }
+      return {
+        ...base,
+        cidades: deduped,
+      };
+    }
+  } catch {
+    // Fallback para as cidades base
+  }
+
+  return base;
 }
 
 export function gerarIdRegistro(tipo: 'IRMAOS' | 'IRMAS' | null, nomeLancador: string): string {
@@ -196,18 +229,24 @@ export async function enviarRegistro(
   }
 
   if (isGoogleScript) {
+    const bodyAscii = toAsciiJson({ action: 'registro', ...payload, id: idUsado });
     const resp = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'registro', ...payload, id: idUsado }),
+      body: bodyAscii,
     });
     const data = await resp.json();
     if (!data?.sucesso) {
       throw new Error(data?.erro || 'Falha ao gravar na planilha Google');
     }
+    const comprovante: Comprovante | null = data.comprovante || null;
+    // Evita que o comprovante retorne com caracteres de substituição corrompidos
+    if (comprovante && payload.cidade && comprovante.cidade && comprovante.cidade.includes('\uFFFD')) {
+      comprovante.cidade = payload.cidade;
+    }
     return {
       idGerado: data.idGerado || idUsado,
-      comprovante: data.comprovante || null,
+      comprovante,
     };
   }
 
@@ -236,10 +275,11 @@ export async function enviarAlerta(params: {
   }
 
   if (isGoogleScript) {
+    const bodyAscii = toAsciiJson({ action: 'alerta', ...params });
     const resp = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'alerta', ...params }),
+      body: bodyAscii,
     });
     const data = await resp.json();
     if (!data?.sucesso) {
@@ -249,4 +289,21 @@ export async function enviarAlerta(params: {
   }
 
   await api.post('/registros/alerta', params);
+}
+
+export async function registrarNovaCidade(novaCidade: string): Promise<void> {
+  const limpa = (novaCidade || '').trim();
+  if (!limpa) return;
+  if (isGoogleScript) {
+    try {
+      const bodyAscii = toAsciiJson({ action: 'adicionarCidade', cidade: limpa });
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: bodyAscii,
+      });
+    } catch {
+      // Silencioso se o script não suportar a ação; o registro local já funcionará perfeitamente
+    }
+  }
 }

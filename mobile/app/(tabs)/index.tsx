@@ -17,11 +17,12 @@ import {
   enviarRegistro,
   enviarAlerta,
   gerarIdRegistro,
+  registrarNovaCidade,
   type ConfigData,
   type Comprovante,
 } from '../../src/backend';
 import { AppPicker } from '../../src/components/AppPicker';
-import { getPrefs, savePrefs, type UserPrefs } from '../../src/session';
+import { getPrefs, savePrefs, addCustomCity, type UserPrefs } from '../../src/session';
 import { notify } from '../../src/utils/notify';
 
 export default function LaunchScreen() {
@@ -35,6 +36,8 @@ export default function LaunchScreen() {
 
   // Form State
   const [cidade, setCidade] = useState('');
+  const [modoOutraCidade, setModoOutraCidade] = useState(false);
+  const [novaCidadeTexto, setNovaCidadeTexto] = useState('');
   const [categoria, setCategoria] = useState('');
   const [instrumento, setInstrumento] = useState('');
   const [ministerio, setMinisterio] = useState('');
@@ -76,10 +79,44 @@ export default function LaunchScreen() {
     setMusicaCargo('');
   };
 
-  const handleLancar = () => {
-    if (!cidade) {
-      notify('Atenção', 'Selecione a cidade antes de lançar.');
+  const handleSelecionarCidade = (val: string) => {
+    if (val === '__OUTRA__') {
+      setModoOutraCidade(true);
+      setNovaCidadeTexto('');
+      setCidade('');
       return;
+    }
+    setModoOutraCidade(false);
+    setCidade(val);
+  };
+
+  const handleSalvarNovaCidade = async () => {
+    const nomeLimpo = novaCidadeTexto.trim();
+    if (!nomeLimpo) {
+      notify('Atenção', 'Digite o nome da cidade.');
+      return;
+    }
+    await addCustomCity(nomeLimpo);
+    registrarNovaCidade(nomeLimpo);
+    const cfgAtualizado = await getConfig(false);
+    setConfig(cfgAtualizado);
+    setCidade(nomeLimpo);
+    setModoOutraCidade(false);
+    notify('✓ Cidade Adicionada', `"${nomeLimpo}" agora está na sua lista.`);
+  };
+
+  const handleLancar = () => {
+    const cidadeFinal = cidade.trim();
+    if (!cidadeFinal) {
+      notify('Atenção', 'Selecione ou digite a cidade antes de lançar.');
+      return;
+    }
+
+    // Se digitou uma nova cidade manualmente, persiste para o futuro
+    if (modoOutraCidade && novaCidadeTexto.trim()) {
+      addCustomCity(novaCidadeTexto.trim());
+      registrarNovaCidade(novaCidadeTexto.trim());
+      getConfig(false).then((cfg) => setConfig(cfg));
     }
 
     const isIrmaos = prefs.tipoSelecionado === 'IRMAOS';
@@ -100,7 +137,7 @@ export default function LaunchScreen() {
     const comprovanteOtimista: Comprovante = {
       id: novoId,
       horario: agora,
-      cidade,
+      cidade: cidadeFinal,
       instrumento: instrumento || '-',
       ministerio: ministerio || '-',
       musica: cargoFinal,
@@ -117,7 +154,7 @@ export default function LaunchScreen() {
       id: novoId,
       tipo: prefs.tipoSelecionado,
       nomeLancador: prefs.nomeLancador,
-      cidade,
+      cidade: cidadeFinal,
       categoria,
       instrumento,
       ministerio,
@@ -137,7 +174,15 @@ export default function LaunchScreen() {
           setUltimoId(res.idGerado);
         }
         if (res?.comprovante) {
-          setUltimoComprovante(res.comprovante);
+          // Proteção anti-corrupção: se porventura o retorno do servidor tiver caracter inválido, mantém a cidade digitada pelo usuário
+          const cidadeValida =
+            res.comprovante.cidade && !res.comprovante.cidade.includes('\uFFFD')
+              ? res.comprovante.cidade
+              : cidadeFinal;
+          setUltimoComprovante({
+            ...res.comprovante,
+            cidade: cidadeValida,
+          });
         } else {
           setUltimoComprovante((prev) =>
             prev
@@ -272,15 +317,61 @@ export default function LaunchScreen() {
 
               {/* Cidade */}
               <View style={styles.fieldGroup}>
-                <Text style={styles.label}>Cidade *</Text>
-                <AppPicker
-                  selectedValue={cidade}
-                  onValueChange={setCidade}
-                  options={[
-                    { label: 'Selecione a cidade...', value: '' },
-                    ...(config?.cidades || []).map((c) => ({ label: c, value: c })),
-                  ]}
-                />
+                <View style={styles.labelRow}>
+                  <Text style={styles.label}>Cidade *</Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (modoOutraCidade) {
+                        setModoOutraCidade(false);
+                      } else {
+                        setModoOutraCidade(true);
+                        setNovaCidadeTexto(cidade || '');
+                      }
+                    }}
+                    style={styles.toggleCustomCityBtn}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.toggleCustomCityText}>
+                      {modoOutraCidade ? '📋 Escolher da lista' : '➕ Outra cidade'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {!modoOutraCidade ? (
+                  <AppPicker
+                    selectedValue={cidade}
+                    onValueChange={handleSelecionarCidade}
+                    options={[
+                      { label: 'Selecione a cidade...', value: '' },
+                      { label: '➕ Digitar outra cidade...', value: '__OUTRA__' },
+                      ...(config?.cidades || []).map((c) => ({ label: c, value: c })),
+                    ]}
+                  />
+                ) : (
+                  <View style={styles.customCityBox}>
+                    <TextInput
+                      style={styles.customCityInput}
+                      placeholder="Nome da cidade / comum..."
+                      placeholderTextColor="#6B7280"
+                      value={novaCidadeTexto}
+                      onChangeText={(t) => {
+                        setNovaCidadeTexto(t);
+                        setCidade(t);
+                      }}
+                      autoCapitalize="words"
+                      autoFocus
+                    />
+                    {novaCidadeTexto.trim().length > 0 && (
+                      <TouchableOpacity
+                        style={styles.saveCityBtn}
+                        onPress={handleSalvarNovaCidade}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={styles.saveCityBtnText}>Salvar na lista</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
               </View>
 
               {/* Campos específicos para IRMÃOS */}
@@ -646,6 +737,50 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  toggleCustomCityBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    backgroundColor: 'rgba(52, 199, 89, 0.12)',
+  },
+  toggleCustomCityText: {
+    color: '#34C759',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  customCityBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  customCityInput: {
+    flex: 1,
+    backgroundColor: '#0F1115',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#34C759',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: '#FFFFFF',
+    fontSize: 15,
+  },
+  saveCityBtn: {
+    backgroundColor: '#34C759',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  saveCityBtnText: {
+    color: '#0F1115',
+    fontSize: 13,
+    fontWeight: '800',
   },
   textInput: {
     backgroundColor: '#0F1115',

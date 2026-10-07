@@ -51,11 +51,49 @@ function doGet(e) {
 
 function doPost(e) {
   try {
-    var raw = e.postData ? e.postData.contents : '{}';
+    var raw = '';
+    if (e.postData) {
+      if (e.postData.getDataAsString) {
+        try { raw = e.postData.getDataAsString('UTF-8'); } catch(ex) {}
+      }
+      if (!raw && e.postData.contents) {
+        raw = e.postData.contents;
+      }
+    }
+    if (!raw) raw = '{}';
     var data = JSON.parse(raw);
     var action = data.action || 'registro';
     
     var ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    if (action === 'adicionarCidade') {
+      var novaCidade = data.cidade ? fixEncoding(String(data.cidade).trim()) : '';
+      if (!novaCidade) {
+        return jsonResponse({ sucesso: false, erro: 'Nome de cidade inválido' });
+      }
+      var sheetBase = ss.getSheetByName('Base Geral');
+      if (sheetBase) {
+        var lastBase = sheetBase.getLastRow();
+        var hVals = lastBase > 1 ? sheetBase.getRange(2, 8, lastBase - 1, 1).getValues() : [];
+        var jaExiste = false;
+        var primeiraLinhaVazia = -1;
+        for (var i = 0; i < hVals.length; i++) {
+          if (String(hVals[i][0]).trim().toLowerCase() === novaCidade.toLowerCase()) {
+            jaExiste = true;
+            break;
+          }
+          if (!hVals[i][0] && primeiraLinhaVazia === -1) {
+            primeiraLinhaVazia = i + 2;
+          }
+        }
+        if (!jaExiste) {
+          if (primeiraLinhaVazia === -1) primeiraLinhaVazia = lastBase + 1;
+          sheetBase.getRange(primeiraLinhaVazia, 8).setValue(novaCidade);
+        }
+      }
+      return jsonResponse({ sucesso: true, cidade: novaCidade });
+    }
+
     var sheetDados = ss.getSheetByName('Dados Geral');
     if (!sheetDados) {
       return jsonResponse({ sucesso: false, erro: 'Aba Dados Geral não encontrada' });
@@ -65,8 +103,8 @@ function doPost(e) {
     
     if (action === 'alerta') {
       var idAlerta = data.id;
-      var aviso = data.aviso || '';
-      var nomeLancador = data.nomeLancador || '';
+      var aviso = fixEncoding(data.aviso || '');
+      var nomeLancador = fixEncoding(data.nomeLancador || '');
       
       var lastRow = sheetDados.getLastRow();
       if (lastRow < 2) {
@@ -96,8 +134,8 @@ function doPost(e) {
     
     // Novo Registro
     var tipo = data.tipo || 'IRMAOS';
-    var nomeLancador = data.nomeLancador || 'Anonimo';
-    var cidade = data.cidade || '';
+    var nomeLancador = fixEncoding(data.nomeLancador || 'Anonimo');
+    var cidade = fixEncoding(data.cidade || '');
     var categoria = data.categoria || '-';
     var instrumento = data.instrumento || '-';
     var ministerio = data.ministerio || '-';
@@ -187,4 +225,29 @@ function dedupe(arr) {
 function jsonResponse(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function fixEncoding(str) {
+  if (!str || typeof str !== 'string') return str;
+  return str
+    .replace(/Ribeir[\ufffd\?]+o/gi, 'Ribeirão')
+    .replace(/S[\ufffd\?]+o/gi, 'São')
+    .replace(/Jardin[\ufffd\?]+polis/gi, 'Jardinópolis')
+    .replace(/Sert[\ufffd\?]+ozinho/gi, 'Sertãozinho')
+    .replace(/C[\ufffd\?]+ndido/gi, 'Cândido')
+    .replace(/M[\ufffd\?]+rio/gi, 'Mário')
+    .replace(/Jos[\ufffd\?]+/gi, 'José')
+    .replace(/Tib[\ufffd\?]+rio/gi, 'Tibério')
+    .replace(/Virg[\ufffd\?]+nia/gi, 'Virgínia')
+    .replace(/Altin[\ufffd\?]+polis/gi, 'Altinópolis')
+    .replace(/C[\ufffd\?]+ssia/gi, 'Cássia')
+    .replace(/Col[\ufffd\?]+mbia/gi, 'Colômbia')
+    .replace(/Gua[\ufffd\?]+ra/gi, 'Guaíra')
+    .replace(/Guar[\ufffd\?]+/gi, 'Guará')
+    .replace(/Ipu[\ufffd\?]+/gi, 'Ipuã')
+    .replace(/Itirapu[\ufffd\?]+/gi, 'Itirapuã')
+    .replace(/Lu[\ufffd\?]+s Ant[\ufffd\?]+nio/gi, 'Luís Antônio')
+    .replace(/Miguel[\ufffd\?]+polis/gi, 'Miguelópolis')
+    .replace(/Orl[\ufffd\?]+ndia/gi, 'Orlândia')
+    .replace(/Patroc[\ufffd\?]+nio/gi, 'Patrocínio');
 }
