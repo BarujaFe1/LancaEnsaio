@@ -176,7 +176,7 @@ export default function LaunchScreen() {
       categoria,
       instrumento,
       ministerio,
-      musicaCargo,
+      musicaCargo: cargoFinal,
     };
 
     setCategoria('');
@@ -415,21 +415,26 @@ export default function LaunchScreen() {
               {/* Música/Cargo */}
               <View style={styles.fieldGroup}>
                 <Text style={styles.label}>
-                  {isIrmaos ? 'Música / Cargo' : 'Cargo Musical'}
+                  {isIrmaos ? 'Música / Cargo' : 'Cargo da Irmã'}
                 </Text>
                 <AppPicker
                   selectedValue={musicaCargo}
                   onValueChange={setMusicaCargo}
-                  options={[
-                    {
-                      label: isIrmaos ? 'Nenhum (Cantor)' : 'Nenhum (Cantora)',
-                      value: '',
-                    },
-                    ...(config?.cargosMusicais || []).map((cargo) => ({
-                      label: cargo,
-                      value: cargo,
-                    })),
-                  ]}
+                  options={
+                    isIrmaos
+                      ? [
+                          { label: 'Nenhum (Cantor)', value: '' },
+                          ...(config?.cargosMusicais || []).map((cargo) => ({
+                            label: cargo,
+                            value: cargo,
+                          })),
+                        ]
+                      : [
+                          { label: 'Nenhuma das duas (Cantora)', value: '' },
+                          { label: 'Instrutora', value: 'Instrutora' },
+                          { label: 'Examinadora', value: 'Examinadora' },
+                        ]
+                  }
                 />
               </View>
 
