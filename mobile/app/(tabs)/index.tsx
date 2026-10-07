@@ -14,13 +14,18 @@ import {
 } from 'react-native';
 import {
   getConfig,
-  enviarRegistro,
   enviarAlerta,
   gerarIdRegistro,
   registrarNovaCidade,
   type ConfigData,
   type Comprovante,
 } from '../../src/backend';
+import {
+  enfileirarLancamento,
+  subscribeQueue,
+  carregarFilaInicial,
+  type QueueStatus,
+} from '../../src/queue';
 import { AppPicker } from '../../src/components/AppPicker';
 import { getPrefs, savePrefs, addCustomCity, type UserPrefs } from '../../src/session';
 import { notify } from '../../src/utils/notify';
@@ -44,6 +49,7 @@ export default function LaunchScreen() {
   const [musicaCargo, setMusicaCargo] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'sincronizando' | 'salvo' | 'erro'>('idle');
+  const [filaInfo, setFilaInfo] = useState<QueueStatus>({ pendentes: 0, sincronizando: false });
   const [ultimoId, setUltimoId] = useState<string | null>(null);
   const [ultimoComprovante, setUltimoComprovante] = useState<Comprovante | null>(null);
   const [modoAlerta, setModoAlerta] = useState(false);
@@ -67,6 +73,18 @@ export default function LaunchScreen() {
 
   useEffect(() => {
     carregarTudo(false);
+    carregarFilaInicial();
+    const unsub = subscribeQueue((status) => {
+      setFilaInfo(status);
+      if (status.pendentes === 0 && !status.sincronizando) {
+        setSyncStatus('salvo');
+      } else if (status.ultimoErro) {
+        setSyncStatus('erro');
+      } else {
+        setSyncStatus('sincronizando');
+      }
+    });
+    return () => unsub();
   }, []);
 
   const handleTrocarTipo = async (novoTipo: 'IRMAOS' | 'IRMAS') => {
@@ -166,42 +184,10 @@ export default function LaunchScreen() {
     setMinisterio('');
     setMusicaCargo('');
 
-    // 4. Grava na planilha do Google Sheets em segundo plano
-    enviarRegistro(payload)
-      .then((res) => {
-        setSyncStatus('salvo');
-        if (res?.idGerado) {
-          setUltimoId(res.idGerado);
-        }
-        if (res?.comprovante) {
-          // Proteção anti-corrupção: se porventura o retorno do servidor tiver caracter inválido, mantém a cidade digitada pelo usuário
-          const cidadeValida =
-            res.comprovante.cidade && !res.comprovante.cidade.includes('\uFFFD')
-              ? res.comprovante.cidade
-              : cidadeFinal;
-          setUltimoComprovante({
-            ...res.comprovante,
-            cidade: cidadeValida,
-          });
-        } else {
-          setUltimoComprovante((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  auditoria: `Lançado por ${prefs.nomeLancador || 'Lançador'} • Gravado na Planilha`,
-                }
-              : null
-          );
-        }
-      })
-      .catch((err) => {
-        console.error('Erro de background ao salvar registro:', err);
-        setSyncStatus('erro');
-        notify(
-          'Aviso de Conexão',
-          'O registro foi anotado, mas a planilha demorou a responder. Ele será reenviado assim que restabelecer.'
-        );
-      });
+    // 4. Enfileira de forma atômica e persistente (salva no dispositivo e despacha em lote/background)
+    enfileirarLancamento(novoId, payload).catch((err) => {
+      console.error('Erro ao enfileirar lançamento:', err);
+    });
   };
 
   const handleAlertar = async () => {
@@ -273,14 +259,14 @@ export default function LaunchScreen() {
               <View style={styles.lastIdBadge}>
                 <Text style={styles.lastIdLabel}>Último ID</Text>
                 <Text style={styles.lastIdValue}>{ultimoId}</Text>
-                {syncStatus === 'sincronizando' && (
-                  <Text style={styles.syncStatusPending}>⏳ Gravando...</Text>
-                )}
-                {syncStatus === 'salvo' && (
+                {filaInfo.pendentes > 0 ? (
+                  <Text style={styles.syncStatusPending}>⏳ {filaInfo.pendentes} na fila</Text>
+                ) : syncStatus === 'salvo' ? (
                   <Text style={styles.syncStatusSuccess}>✓ Na Planilha</Text>
-                )}
-                {syncStatus === 'erro' && (
+                ) : syncStatus === 'erro' ? (
                   <Text style={styles.syncStatusError}>⚠ Rede instável</Text>
+                ) : (
+                  <Text style={styles.syncStatusSuccess}>✓ Pronto</Text>
                 )}
               </View>
             )}
@@ -456,6 +442,14 @@ export default function LaunchScreen() {
                 <Text style={styles.primaryButtonText}>Lançar Agora</Text>
                 <Text style={styles.primaryButtonIcon}>⚡</Text>
               </TouchableOpacity>
+
+              {filaInfo.pendentes > 0 && (
+                <View style={styles.queueBanner}>
+                  <Text style={styles.queueBannerText}>
+                    ⚡ {filaInfo.pendentes} lançamento{filaInfo.pendentes > 1 ? 's' : ''} seguro{filaInfo.pendentes > 1 ? 's' : ''} no celular • Enviando à planilha em segundo plano...
+                  </Text>
+                </View>
+              )}
             </View>
 
             {/* Comprovante do Último Lançamento */}
@@ -463,16 +457,21 @@ export default function LaunchScreen() {
               <View style={styles.comprovanteCard}>
                 <View style={styles.comprovanteHeader}>
                   <Text style={styles.comprovanteTitle}>📋 Último Lançamento</Text>
-                  {syncStatus === 'salvo' && (
+                  {filaInfo.pendentes > 0 ? (
+                    <View style={styles.statusPillPending}>
+                      <Text style={styles.statusPillTextPending}>
+                        ⏳ {filaInfo.pendentes} na fila ({filaInfo.sincronizando ? 'enviando...' : 'salvo offline'})
+                      </Text>
+                    </View>
+                  ) : syncStatus === 'salvo' ? (
                     <View style={styles.statusPillSuccess}>
                       <Text style={styles.statusPillTextSuccess}>✓ Na Planilha</Text>
                     </View>
-                  )}
-                  {syncStatus === 'sincronizando' && (
-                    <View style={styles.statusPillPending}>
-                      <Text style={styles.statusPillTextPending}>⏳ Gravando...</Text>
+                  ) : syncStatus === 'erro' ? (
+                    <View style={styles.statusPillError}>
+                      <Text style={styles.statusPillTextError}>⚠ Salvo offline</Text>
                     </View>
-                  )}
+                  ) : null}
                 </View>
 
                 <View style={styles.comprovanteContent}>
@@ -896,6 +895,33 @@ const styles = StyleSheet.create({
     color: '#FF9500',
     fontSize: 11,
     fontWeight: '700',
+  },
+  statusPillError: {
+    backgroundColor: 'rgba(255, 69, 58, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  statusPillTextError: {
+    color: '#FF453A',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  queueBanner: {
+    backgroundColor: 'rgba(52, 199, 89, 0.1)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(52, 199, 89, 0.25)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 10,
+  },
+  queueBannerText: {
+    color: '#34C759',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+    lineHeight: 16,
   },
   comprovanteContent: {
     gap: 10,

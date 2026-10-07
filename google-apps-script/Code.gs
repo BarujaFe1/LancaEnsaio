@@ -98,104 +98,191 @@ function doPost(e) {
     if (!sheetDados) {
       return jsonResponse({ sucesso: false, erro: 'Aba Dados Geral não encontrada' });
     }
-    
-    var nowBR = Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'dd/MM/yyyy, HH:mm:ss');
-    
-    if (action === 'alerta') {
-      var idAlerta = data.id;
-      var aviso = fixEncoding(data.aviso || '');
-      var nomeLancador = fixEncoding(data.nomeLancador || '');
+
+    // Trava de execução exclusiva para evitar concorrência e perda de dados
+    var lock = LockService.getScriptLock();
+    var hasLock = lock.tryLock(28000);
+    if (!hasLock) {
+      return jsonResponse({ sucesso: false, erro: 'Planilha ocupada. Aguardando liberação para gravar sem perda.' });
+    }
+
+    try {
+      var nowBR = Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'dd/MM/yyyy, HH:mm:ss');
       
-      var lastRow = sheetDados.getLastRow();
-      if (lastRow < 2) {
-        return jsonResponse({ sucesso: false, erro: 'Nenhum registro para alertar' });
+      if (action === 'alerta') {
+        var idAlerta = data.id;
+        var aviso = fixEncoding(data.aviso || '');
+        var nomeLancador = fixEncoding(data.nomeLancador || '');
+        
+        var lastRow = sheetDados.getLastRow();
+        if (lastRow < 2) {
+          return jsonResponse({ sucesso: false, erro: 'Nenhum registro para alertar' });
+        }
+        
+        var ids = sheetDados.getRange(2, 2, lastRow - 1, 1).getValues();
+        var targetRow = -1;
+        for (var i = ids.length - 1; i >= 0; i--) {
+          if (ids[i][0] === idAlerta) {
+            targetRow = i + 2;
+            break;
+          }
+        }
+        
+        if (targetRow === -1) {
+          return jsonResponse({ sucesso: false, erro: 'Registro não encontrado' });
+        }
+        
+        var cellAudit = sheetDados.getRange(targetRow, 8);
+        var currentAudit = cellAudit.getValue() || '';
+        var novoAlerta = ' | ALERTA (' + nowBR + ' - ' + nomeLancador + '): ' + aviso;
+        cellAudit.setValue(currentAudit + novoAlerta);
+        
+        return jsonResponse({ sucesso: true, mensagem: 'Alerta adicionado com sucesso' });
+      }
+
+      // Processamento em Lote (Batch) de alta velocidade
+      if (action === 'lote' && Array.isArray(data.itens) && data.itens.length > 0) {
+        var lastRowDados = sheetDados.getLastRow();
+        var recentIds = [];
+        if (lastRowDados > 1) {
+          var scanRows = Math.min(lastRowDados - 1, 200);
+          var scanRange = sheetDados.getRange(lastRowDados - scanRows + 1, 2, scanRows, 1).getValues();
+          for (var s = 0; s < scanRange.length; s++) {
+            if (scanRange[s][0]) recentIds.push(String(scanRange[s][0]));
+          }
+        }
+
+        var linhasParaInserir = [];
+        for (var idx = 0; idx < data.itens.length; idx++) {
+          var item = data.itens[idx];
+          var itemTipo = item.tipo || 'IRMAOS';
+          var itemNome = fixEncoding(item.nomeLancador || 'Anonimo');
+          var itemCidade = fixEncoding(item.cidade || '');
+          var itemCat = item.categoria || '-';
+          var itemInst = item.instrumento || '-';
+          var itemMin = item.ministerio || '-';
+          var itemCargo = item.musicaCargo || '-';
+
+          var cargoFinalLote = itemCargo;
+          var auditLote = [];
+          if (itemTipo === 'IRMAS') {
+            if (!itemCidade) auditLote.push('ERRO 01: 🏙️ Falta Cidade');
+            if (!itemCargo || itemCargo === '-') cargoFinalLote = 'Cantora';
+          } else {
+            var isVazioLote = (!itemCat || itemCat === '-') && (!itemInst || itemInst === '-') && (!itemMin || itemMin === '-') && (!itemCargo || itemCargo === '-');
+            if (isVazioLote) cargoFinalLote = 'Cantor';
+            if (!itemCidade) auditLote.push('ERRO 01: 🏙️ Falta Cidade');
+            if (itemMin && itemMin !== '-' && itemInst && itemInst !== '-') auditLote.push('ERRO 11: 👔 Min Tocando');
+          }
+
+          var itemId = (item.id && String(item.id).trim()) ? String(item.id).trim() : gerarId(itemTipo, itemNome);
+          // Deduplicação: se o ID já foi gravado, pula
+          if (recentIds.indexOf(itemId) !== -1) continue;
+          recentIds.push(itemId);
+
+          var metaLote = 'META APP=UNIFICADO TIPO=' + itemTipo + ' USER=' + itemNome;
+          var colAuditLote = (auditLote.length > 0 ? auditLote.join(' | ') + ' | ' : '') + metaLote;
+
+          linhasParaInserir.push([
+            nowBR,
+            itemId,
+            itemCat,
+            itemInst,
+            itemCidade,
+            itemMin,
+            cargoFinalLote,
+            colAuditLote
+          ]);
+        }
+
+        if (linhasParaInserir.length > 0) {
+          sheetDados.getRange(sheetDados.getLastRow() + 1, 1, linhasParaInserir.length, 8).setValues(linhasParaInserir);
+        }
+
+        return jsonResponse({ sucesso: true, processados: linhasParaInserir.length });
       }
       
-      var ids = sheetDados.getRange(2, 2, lastRow - 1, 1).getValues();
-      var targetRow = -1;
-      for (var i = ids.length - 1; i >= 0; i--) {
-        if (ids[i][0] === idAlerta) {
-          targetRow = i + 2;
-          break;
+      // Novo Registro Unitário
+      var tipo = data.tipo || 'IRMAOS';
+      var nomeLancador = fixEncoding(data.nomeLancador || 'Anonimo');
+      var cidade = fixEncoding(data.cidade || '');
+      var categoria = data.categoria || '-';
+      var instrumento = data.instrumento || '-';
+      var ministerio = data.ministerio || '-';
+      var musicaCargo = data.musicaCargo || '-';
+      
+      // Auditoria
+      var cargoFinal = musicaCargo;
+      var auditoriaMsgs = [];
+      
+      if (tipo === 'IRMAS') {
+        if (!cidade) auditoriaMsgs.push('ERRO 01: 🏙️ Falta Cidade');
+        if (!musicaCargo || musicaCargo === '-') {
+          cargoFinal = 'Cantora';
+        }
+      } else {
+        var isVazio = (!categoria || categoria === '-') && (!instrumento || instrumento === '-') && (!ministerio || ministerio === '-') && (!musicaCargo || musicaCargo === '-');
+        if (isVazio) {
+          cargoFinal = 'Cantor';
+        }
+        if (!cidade) auditoriaMsgs.push('ERRO 01: 🏙️ Falta Cidade');
+        if (ministerio && ministerio !== '-' && instrumento && instrumento !== '-') {
+          auditoriaMsgs.push('ERRO 11: 👔 Min Tocando');
         }
       }
       
-      if (targetRow === -1) {
-        return jsonResponse({ sucesso: false, erro: 'Registro não encontrado' });
+      // Gerar ID e checar deduplicação
+      var idGerado = (data.id && String(data.id).trim()) ? String(data.id).trim() : gerarId(tipo, nomeLancador);
+      var lastRowCheck = sheetDados.getLastRow();
+      var idJaExiste = false;
+      if (lastRowCheck > 1) {
+        var scanLimit = Math.min(lastRowCheck - 1, 150);
+        var recentVals = sheetDados.getRange(lastRowCheck - scanLimit + 1, 2, scanLimit, 1).getValues();
+        for (var rk = 0; rk < recentVals.length; rk++) {
+          if (recentVals[rk][0] === idGerado) {
+            idJaExiste = true;
+            break;
+          }
+        }
+      }
+
+      if (!idJaExiste) {
+        var meta = 'META APP=UNIFICADO TIPO=' + tipo + ' USER=' + nomeLancador;
+        var colunaAudit = (auditoriaMsgs.length > 0 ? auditoriaMsgs.join(' | ') + ' | ' : '') + meta;
+        
+        var novaLinha = [
+          nowBR,
+          idGerado,
+          categoria,
+          instrumento,
+          cidade,
+          ministerio,
+          cargoFinal,
+          colunaAudit
+        ];
+        
+        sheetDados.appendRow(novaLinha);
       }
       
-      var cellAudit = sheetDados.getRange(targetRow, 8);
-      var currentAudit = cellAudit.getValue() || '';
-      var novoAlerta = ' | ALERTA (' + nowBR + ' - ' + nomeLancador + '): ' + aviso;
-      cellAudit.setValue(currentAudit + novoAlerta);
+      var comprovante = {
+        id: idGerado,
+        horario: nowBR,
+        cidade: cidade,
+        instrumento: instrumento,
+        ministerio: ministerio,
+        musica: cargoFinal,
+        auditoria: 'Lançado por ' + nomeLancador
+      };
       
-      return jsonResponse({ sucesso: true, mensagem: 'Alerta adicionado com sucesso' });
+      return jsonResponse({
+        sucesso: true,
+        idGerado: idGerado,
+        comprovante: comprovante
+      });
+      
+    } finally {
+      lock.releaseLock();
     }
-    
-    // Novo Registro
-    var tipo = data.tipo || 'IRMAOS';
-    var nomeLancador = fixEncoding(data.nomeLancador || 'Anonimo');
-    var cidade = fixEncoding(data.cidade || '');
-    var categoria = data.categoria || '-';
-    var instrumento = data.instrumento || '-';
-    var ministerio = data.ministerio || '-';
-    var musicaCargo = data.musicaCargo || '-';
-    
-    // Auditoria
-    var cargoFinal = musicaCargo;
-    var auditoriaMsgs = [];
-    
-    if (tipo === 'IRMAS') {
-      if (!cidade) auditoriaMsgs.push('ERRO 01: 🏙️ Falta Cidade');
-      if (!musicaCargo || musicaCargo === '-') {
-        cargoFinal = 'Cantora';
-      }
-    } else {
-      // IRMÃOS
-      var isVazio = (!categoria || categoria === '-') && (!instrumento || instrumento === '-') && (!ministerio || ministerio === '-') && (!musicaCargo || musicaCargo === '-');
-      if (isVazio) {
-        cargoFinal = 'Cantor';
-      }
-      if (!cidade) auditoriaMsgs.push('ERRO 01: 🏙️ Falta Cidade');
-      if (ministerio && ministerio !== '-' && instrumento && instrumento !== '-') {
-        auditoriaMsgs.push('ERRO 11: 👔 Min Tocando');
-      }
-    }
-    
-    // Gerar ID
-    var idGerado = (data.id && String(data.id).trim()) ? String(data.id).trim() : gerarId(tipo, nomeLancador);
-    var meta = 'META APP=UNIFICADO TIPO=' + tipo + ' USER=' + nomeLancador;
-    var colunaAudit = (auditoriaMsgs.length > 0 ? auditoriaMsgs.join(' | ') + ' | ' : '') + meta;
-    
-    var novaLinha = [
-      nowBR,
-      idGerado,
-      categoria,
-      instrumento,
-      cidade,
-      ministerio,
-      cargoFinal,
-      colunaAudit
-    ];
-    
-    sheetDados.appendRow(novaLinha);
-    
-    var comprovante = {
-      id: idGerado,
-      horario: nowBR,
-      cidade: cidade,
-      instrumento: instrumento,
-      ministerio: ministerio,
-      musica: cargoFinal,
-      auditoria: 'Lançado por ' + nomeLancador
-    };
-    
-    return jsonResponse({
-      sucesso: true,
-      idGerado: idGerado,
-      comprovante: comprovante
-    });
-    
   } catch (err) {
     return jsonResponse({ sucesso: false, erro: String(err) });
   }
