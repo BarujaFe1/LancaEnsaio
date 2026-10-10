@@ -430,9 +430,11 @@ export default function LaunchScreen() {
                           })),
                         ]
                       : [
-                          { label: 'Nenhuma das duas (Cantora)', value: '' },
+                          { label: 'Nenhum (Cantora)', value: '' },
+                          { label: 'Organista', value: 'Organista' },
                           { label: 'Instrutora', value: 'Instrutora' },
                           { label: 'Examinadora', value: 'Examinadora' },
+                          { label: 'Arquivo Digital', value: 'Arquivo Digital' },
                         ]
                   }
                 />
